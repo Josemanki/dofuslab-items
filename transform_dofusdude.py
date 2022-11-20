@@ -115,7 +115,7 @@ def transform_items():
 
   for item in serialized:
     if item_exists(item['name']):
-      print('{} is already in the list'.format(item['name']))
+      print('.')
     else:
       if 'effects' in item and item['type']['name'] not in ignored_categories:
         print('Adding {} to items...'.format(item['name']))
@@ -142,23 +142,28 @@ def transform_items():
         print('Added {} to items'.format(item['name']))
 
     with open('output/items.json', 'w+', encoding='utf8') as outfile:
-      outfile.write(json.dumps(final_items, ensure_ascii=False))
+      outfile.write(json.dumps(serialized_current_items +
+                    final_items, ensure_ascii=False))
       outfile.close()
 
     with open('output/mounts.json', 'w+', encoding='utf8') as outfile:
-      outfile.write(json.dumps(final_mounts, ensure_ascii=False))
+      outfile.write(json.dumps(serialized_current_mounts +
+                    final_mounts, ensure_ascii=False))
       outfile.close()
 
     with open('output/pets.json', 'w+', encoding='utf8') as outfile:
-      outfile.write(json.dumps(final_pets, ensure_ascii=False))
+      outfile.write(json.dumps(serialized_current_pets +
+                    final_pets, ensure_ascii=False))
       outfile.close()
 
     with open('output/rhineetles.json', 'w+', encoding='utf8') as outfile:
-      outfile.write(json.dumps(final_rhineetles, ensure_ascii=False))
+      outfile.write(json.dumps(
+          serialized_current_rhineetles + final_rhineetles, ensure_ascii=False))
       outfile.close()
 
     with open('output/weapons.json', 'w+', encoding='utf8') as outfile:
-      outfile.write(json.dumps(final_weapons, ensure_ascii=False))
+      outfile.write(json.dumps(serialized_current_weapons +
+                    final_weapons, ensure_ascii=False))
       outfile.close()
 
 
