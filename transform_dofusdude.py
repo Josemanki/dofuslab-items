@@ -4,9 +4,11 @@ import requests
 from constants import CUSTOM_STAT_MAP, NORMAL_STAT_MAP
 
 dofusdude_data = open('input/dofusdude-example-2.json')
-dofuslab_current_data = open('input/dofuslab-example-2.json')
 serialized = json.load(dofusdude_data)
+dofusdude_data.close()
+dofuslab_current_data = open('input/dofuslab-example-2.json', 'r')
 serialized_current = json.load(dofuslab_current_data)
+dofuslab_current_data.close()
 final_items = []
 
 
@@ -65,36 +67,38 @@ def transform_stats(stats):
 
 
 def transform_items():
-  final_items = serialized_current
+  final_items.append(serialized_current)
   for item in serialized:
     if item_exists(item['ankama_id']):
       print('{} is already in the list'.format(item['name']))
     else:
-      print('Adding {} to items...'.format(item['name']))
-      item_effects = transform_stats(item['effects'])
-      rebuilt_item = {
-          'dofusID': str(item['ankama_id']),
-          'name': {
-              'en': item['name'],
-              'fr': item['name'],
-              'de': item['name'],
-              'es': item['name'],
-              'it': item['name'],
-              'pt': item['name']
-          },
-          'itemType': item['type']['name'],
-          'setID': item['parent_set']['id'] if 'parent_set' in item else None,
-          'level': item['level'],
-          'stats': item_effects['stats'],
-          'customStats': item_effects['customStats'],
-          'conditions': transform_conditions(item['conditions']) if 'conditions' in item else {},
-          'image': format_image_and_download(item['image_urls'])
-      }
-      final_items.append(rebuilt_item)
-      print('Added {} to items'.format(item['name']))
+      if 'effects' in item:
+        print('Adding {} to items...'.format(item['name']))
+        item_effects = transform_stats(item['effects'])
+        rebuilt_item = {
+            'dofusID': str(item['ankama_id']),
+            'name': {
+                'en': item['name'],
+                'fr': item['name'],
+                'de': item['name'],
+                'es': item['name'],
+                'it': item['name'],
+                'pt': item['name']
+            },
+            'itemType': item['type']['name'],
+            'setID': item['parent_set']['id'] if 'parent_set' in item else None,
+            'level': item['level'],
+            'stats': item_effects['stats'],
+            'customStats': item_effects['customStats'],
+            'conditions': transform_conditions(item['conditions']) if 'conditions' in item else {},
+            'image': format_image_and_download(item['image_urls'])
+        }
+        final_items.append(rebuilt_item)
+        print('Added {} to items'.format(item['name']))
 
-    with open('output/dofuslab-data.json', 'w', encoding='utf8') as outfile:
-      json.dump(final_items, outfile, indent=2, ensure_ascii=False)
+    with open('output/dofuslab-data.json', 'w+', encoding='utf8') as outfile:
+      outfile.write(json.dumps(final_items, ensure_ascii=False))
+      outfile.close()
 
 
 __main__ = transform_items()
