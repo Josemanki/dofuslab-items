@@ -168,3 +168,20 @@ CUSTOM_STAT_MAP = [
     "-special spell-",
     "The spell can be cast on a free cell"
 ]
+
+PET_ITEM_TYPES = ['Pet', 'Petsmount']
+
+WEAPON_TYPES = [
+    "Axe",
+    "Bow",
+    "Dagger",
+    "Hammer",
+    "Pickaxe",
+    "Scythe",
+    "Shovel",
+    "Soul stone",
+    "Staff",
+    "Sword",
+    "Tool",
+    "Wand"
+]
