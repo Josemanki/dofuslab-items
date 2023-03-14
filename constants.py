@@ -189,3 +189,6 @@ WEAPON_TYPES = [
     "Tool",
     "Wand"
 ]
+
+IGNORED_CATEGORIES = ['Sidekick', 'Tool',
+                      'Pickaxe', 'Soul stone', 'Capturing net', 'Prysmaradite', 'Magic weapon', 'Expedition Idol']
