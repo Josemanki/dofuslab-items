@@ -109,7 +109,7 @@ def categorize_item(item):
 
 def format_image_and_download(image_urls):
     dir_path = path.dirname(path.realpath(__file__))
-    img_id = image_urls["icon"].split("item/")[1]
+    img_id = image_urls["sd"].split("item/")[1]
     subfolder = "output/images"
     complete_name = path.join(dir_path, subfolder, img_id)
     img_data = requests.get(image_urls["icon"]).content
