@@ -169,10 +169,10 @@ CUSTOM_STAT_MAP = [
     "Rename guild:",
     "Get a divorce",
     "-special spell-",
-    "The spell can be cast on a free cell"
+    "The spell can be cast on a free cell",
 ]
 
-PET_ITEM_TYPES = ['Pet', 'Petsmount']
+PET_ITEM_TYPES = ["Pet", "Petsmount"]
 
 WEAPON_TYPES = [
     "Axe",
@@ -187,8 +187,16 @@ WEAPON_TYPES = [
     "Staff",
     "Sword",
     "Tool",
-    "Wand"
+    "Wand",
 ]
 
-IGNORED_CATEGORIES = ['Sidekick', 'Tool',
-                      'Pickaxe', 'Soul stone', 'Capturing net', 'Prysmaradite', 'Magic weapon', 'Expedition Idol']
+IGNORED_CATEGORIES = [
+    "Sidekick",
+    "Tool",
+    "Pickaxe",
+    "Soul stone",
+    "Capturing net",
+    "Prysmaradite",
+    "Magic weapon",
+    "Expedition Idol",
+]
