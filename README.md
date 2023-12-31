@@ -4,8 +4,10 @@ This repository is to facilitate updating DofusLab's data from [Survival's tools
 
 ## Running
 
-First, copy the extracted data into the appropriate `input` directory.
-
-Then, run the appropriate `transform_*.py` script.
+Run the appropriate `transform_*.py` script.
 
 You can find your output in the the `output` directory.
+
+## Caveats
+
+The transformation of item stats works mostly perfectly, but as this is still mostly a WIP tool to be used sparingly, there is stuff to be checked manually. A clear example of this would be that the tool has not yet blacklisted items that we purposely do not add to Dofuslab (eg. perceptor items), meaning that we can fully confidently copy-paste the items and sets individually, but the tool does not yet allow to replace the whole file.
