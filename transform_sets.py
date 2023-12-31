@@ -74,7 +74,9 @@ def generate_set_bonuses(bonuses):
   # Bonuses is a 2D array from Dofusdude, that needs to be transformed to an object, with number keys and arrays as values
   transformed = {}
 
-  for i in range(1, len(bonuses)):
+  print(len(bonuses))
+
+  for i in range(1, len(bonuses) + 1):
     transformed[i+1] = []
 
     for bonus in bonuses[i-1]:
