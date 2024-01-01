@@ -174,7 +174,7 @@ CUSTOM_STAT_MAP = [
 
 PET_ITEM_TYPES = ["Pet", "Petsmount"]
 
-DOFUSLAB_CATEGORIES = ['items', 'mounts', 'pets', 'rhineetles', 'sets', 'weapons']
+DOFUSLAB_CATEGORIES = ["items", "mounts", "pets", "rhineetles", "sets", "weapons"]
 
 WEAPON_TYPES = [
     "Axe",
@@ -203,6 +203,6 @@ IGNORED_CATEGORIES = [
     "Expedition Idol",
 ]
 
-SETS_BASE_URL = 'https://api.dofusdu.de/dofus2/{}/sets/all'
-ITEMS_BASE_URL = 'https://api.dofusdu.de/dofus2/{}/items/equipment/all'
-DOFUSLAB_GH_BASE_URL = 'https://raw.githubusercontent.com/dofuslab/dofuslab/master/server/app/database/data/{}.json'
+SETS_BASE_URL = "https://api.dofusdu.de/dofus2/{}/sets/all"
+ITEMS_BASE_URL = "https://api.dofusdu.de/dofus2/{}/items/equipment/all"
+DOFUSLAB_GH_BASE_URL = "https://raw.githubusercontent.com/dofuslab/dofuslab/master/server/app/database/data/{}.json"

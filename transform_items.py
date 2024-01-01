@@ -11,9 +11,7 @@ from constants import (
     WEAPON_STAT_MAP,
     IGNORED_CATEGORIES,
 )
-from fetch import (
-    get_item_files
-)
+from fetch import get_item_files
 
 try:
     get_item_files()
@@ -187,7 +185,7 @@ def localize_custom_stats_from_id(stat_ids, item_stats):
 
 
 def transform_items():
-    for item in en_dofusdude_data['items']:
+    for item in en_dofusdude_data["items"]:
         if item_exists(item["name"]):
             continue
         elif item["is_weapon"]:
@@ -198,12 +196,12 @@ def transform_items():
                 custom_stats = {}
 
                 # Locales
-                en_item = find_localized_item(item["ankama_id"], en_dofusdude_data['items'])
-                fr_item = find_localized_item(item["ankama_id"], fr_dofusdude_data['items'])
-                es_item = find_localized_item(item["ankama_id"], es_dofusdude_data['items'])
-                de_item = find_localized_item(item["ankama_id"], de_dofusdude_data['items'])
-                it_item = find_localized_item(item["ankama_id"], it_dofusdude_data['items'])
-                pt_item = find_localized_item(item["ankama_id"], pt_dofusdude_data['items'])
+                en_item = find_localized_item(item["ankama_id"], en_dofusdude_data["items"])
+                fr_item = find_localized_item(item["ankama_id"], fr_dofusdude_data["items"])
+                es_item = find_localized_item(item["ankama_id"], es_dofusdude_data["items"])
+                de_item = find_localized_item(item["ankama_id"], de_dofusdude_data["items"])
+                it_item = find_localized_item(item["ankama_id"], it_dofusdude_data["items"])
+                pt_item = find_localized_item(item["ankama_id"], pt_dofusdude_data["items"])
 
                 if "en" in item_effects["customStats"]:
                     custom_stats = {
@@ -252,12 +250,12 @@ def transform_items():
                 custom_stats = {}
 
                 # Locales
-                en_item = find_localized_item(item["ankama_id"], en_dofusdude_data['items'])
-                fr_item = find_localized_item(item["ankama_id"], fr_dofusdude_data['items'])
-                es_item = find_localized_item(item["ankama_id"], es_dofusdude_data['items'])
-                de_item = find_localized_item(item["ankama_id"], de_dofusdude_data['items'])
-                it_item = find_localized_item(item["ankama_id"], it_dofusdude_data['items'])
-                pt_item = find_localized_item(item["ankama_id"], pt_dofusdude_data['items'])
+                en_item = find_localized_item(item["ankama_id"], en_dofusdude_data["items"])
+                fr_item = find_localized_item(item["ankama_id"], fr_dofusdude_data["items"])
+                es_item = find_localized_item(item["ankama_id"], es_dofusdude_data["items"])
+                de_item = find_localized_item(item["ankama_id"], de_dofusdude_data["items"])
+                it_item = find_localized_item(item["ankama_id"], it_dofusdude_data["items"])
+                pt_item = find_localized_item(item["ankama_id"], pt_dofusdude_data["items"])
 
                 if "en" in item_effects["customStats"]:
                     custom_stats = {

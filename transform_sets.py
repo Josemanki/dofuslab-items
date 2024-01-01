@@ -3,9 +3,7 @@
 import json
 from constants import NORMAL_STAT_MAP
 
-from fetch import (
-    get_set_files
-)
+from fetch import get_set_files
 
 try:
     get_set_files()
@@ -91,7 +89,7 @@ def generate_set_bonuses(bonuses):
 
 
 def transform_sets():
-    for set in en_dofusdude_data['sets']:
+    for set in en_dofusdude_data["sets"]:
         print(set)
         if item_exists(set["name"]):
             continue
@@ -100,12 +98,12 @@ def transform_sets():
                 print("Adding {} to items...".format(set["name"]))
 
                 # Locales
-                en_set = find_localized_item(set["ankama_id"], en_dofusdude_data['sets'])
-                fr_set = find_localized_item(set["ankama_id"], fr_dofusdude_data['sets'])
-                es_set = find_localized_item(set["ankama_id"], es_dofusdude_data['sets'])
-                de_set = find_localized_item(set["ankama_id"], de_dofusdude_data['sets'])
-                it_set = find_localized_item(set["ankama_id"], it_dofusdude_data['sets'])
-                pt_set = find_localized_item(set["ankama_id"], pt_dofusdude_data['sets'])
+                en_set = find_localized_item(set["ankama_id"], en_dofusdude_data["sets"])
+                fr_set = find_localized_item(set["ankama_id"], fr_dofusdude_data["sets"])
+                es_set = find_localized_item(set["ankama_id"], es_dofusdude_data["sets"])
+                de_set = find_localized_item(set["ankama_id"], de_dofusdude_data["sets"])
+                it_set = find_localized_item(set["ankama_id"], it_dofusdude_data["sets"])
+                pt_set = find_localized_item(set["ankama_id"], pt_dofusdude_data["sets"])
 
                 rebuilt_set = {
                     "id": str(set["ankama_id"]),
