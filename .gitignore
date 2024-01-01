@@ -1,5 +1,5 @@
-output/*
-input/*
+output
+input
 
 # via https://raw.githubusercontent.com/github/gitignore/main/Python.gitignore
 
