@@ -3,17 +3,16 @@
 import json
 from constants import NORMAL_STAT_MAP
 
-from fetch import get_set_files
+from fetch import get_set_files, get_dofuslab_files
 
 try:
     get_set_files()
-
+    get_dofuslab_files()
 except Exception as e:
     print(f"An error occurred: {str(e)}")
 
 # Opening all languages in order to populate localized names
 # This will be a list of requests in the future, not so many files being opened
-
 dofusdude_json_en = open("input/dofusdude/sets/en_all.json")
 en_dofusdude_data = json.load(dofusdude_json_en)
 dofusdude_json_en.close()
@@ -39,13 +38,11 @@ it_dofusdude_data = json.load(dofusdude_json_it)
 dofusdude_json_it.close()
 
 # Dofuslab sets
-
 dofuslab_json = open("input/dofuslab/sets.json")
 dofuslab_sets_json = json.load(dofuslab_json)
 dofuslab_json.close()
 
 # List of sets
-
 final_sets = []
 
 

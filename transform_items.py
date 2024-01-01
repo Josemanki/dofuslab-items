@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from os import path
+from os import path, makedirs
 import json
 import requests
 from constants import (
@@ -111,6 +111,10 @@ def format_image_and_download(image_urls):
     subfolder = "output/images"
     complete_name = path.join(dir_path, subfolder, img_id)
     img_data = requests.get(image_urls["icon"]).content
+
+    if not path.exists(path.join(dir_path, subfolder)):
+        makedirs(path.join(dir_path, subfolder))
+
     with open(complete_name, "wb") as handler:
         handler.write(img_data)
     return img_id
