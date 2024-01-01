@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from os import path
+from os import path, makedirs
 import json
 import requests
 from constants import (
@@ -23,6 +23,9 @@ def get_set_files():
         subfolder = "input/dofusdude/sets"
         complete_name = path.join(dir_path, subfolder, name)
 
+        if not path.exists(path.join(dir_path, subfolder)):
+            makedirs(path.join(dir_path, subfolder))
+
         with open(complete_name, "w", encoding="utf8") as file:
             json.dump(parsed, file, indent=4, ensure_ascii=False)
 
@@ -37,6 +40,9 @@ def get_item_files():
         subfolder = "input/dofusdude/equipment"
         complete_name = path.join(dir_path, subfolder, name)
 
+        if not path.exists(path.join(dir_path, subfolder)):
+            makedirs(path.join(dir_path, subfolder))
+
         with open(complete_name, "w", encoding="utf8") as file:
             json.dump(parsed, file, indent=4, ensure_ascii=False)
 
@@ -50,6 +56,9 @@ def get_dofuslab_files():
         name = "{}.json".format(category)
         subfolder = "input/dofuslab"
         complete_name = path.join(dir_path, subfolder, name)
+
+        if not path.exists(path.join(dir_path, subfolder)):
+            makedirs(path.join(dir_path, subfolder))
 
         with open(complete_name, "w", encoding="utf8") as file:
             json.dump(parsed, file, indent=4, ensure_ascii=False)
