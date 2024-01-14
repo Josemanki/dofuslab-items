@@ -68,21 +68,14 @@ def generate_set_bonuses(bonuses):
 
 
 def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replace: bool = False):
-    en_dofusdude_data = dofusdude_data["en"]
-    fr_dofusdude_data = dofusdude_data["fr"]
-    es_dofusdude_data = dofusdude_data["es"]
-    de_dofusdude_data = dofusdude_data["de"]
-    it_dofusdude_data = dofusdude_data["it"]
-    pt_dofusdude_data = dofusdude_data["pt"]
-
     # List of sets
     final_sets = []
 
     if not path.exists("output"):
         makedirs("output")
 
-    for set in en_dofusdude_data["sets"]:
-        # skip set if the name contains " Ceremonial Set"
+    for set in dofusdude_data["en"]["sets"]:
+        # skip set if the name contains " Ceremonial Set" - the leading space is important
         if " Ceremonial Set" in set["name"]:
             logger.info(f"Skipping: {set["name"]}")
             continue
@@ -103,15 +96,15 @@ def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replac
             logger.debug(f"Adding {set["name"]}...")
 
             # Locales
-            en_set = find_localized_item(set["ankama_id"], en_dofusdude_data["sets"])
-            fr_set = find_localized_item(set["ankama_id"], fr_dofusdude_data["sets"])
-            es_set = find_localized_item(set["ankama_id"], es_dofusdude_data["sets"])
-            de_set = find_localized_item(set["ankama_id"], de_dofusdude_data["sets"])
-            it_set = find_localized_item(set["ankama_id"], it_dofusdude_data["sets"])
-            pt_set = find_localized_item(set["ankama_id"], pt_dofusdude_data["sets"])
+            en_set = find_localized_item(set["ankama_id"], dofusdude_data["en"]["sets"])
+            fr_set = find_localized_item(set["ankama_id"], dofusdude_data["fr"]["sets"])
+            es_set = find_localized_item(set["ankama_id"], dofusdude_data["es"]["sets"])
+            de_set = find_localized_item(set["ankama_id"], dofusdude_data["de"]["sets"])
+            it_set = find_localized_item(set["ankama_id"], dofusdude_data["it"]["sets"])
+            pt_set = find_localized_item(set["ankama_id"], dofusdude_data["pt"]["sets"])
 
             rebuilt_set = {
-                "id": str(set["ankama_id"]),
+                "id": set["ankama_id"],
                 "name": {
                     "en": en_set["name"],
                     "fr": fr_set["name"],
@@ -152,7 +145,14 @@ def main():
         default=False,
     )
     parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Enables debug output including raw set json", default=False
+        "-v", "--verbose", action="store_true", help="Enables verbose debug output", default=False
+    )
+    parser.add_argument(
+        "-i",
+        "--ignore_dofuslab",
+        action="store_true",
+        help="Ignores dofuslab data and regenerates entirely from doduda",
+        default=False
     )
 
     args = parser.parse_args()
@@ -190,9 +190,11 @@ def main():
     dofusdude_json_it.close()
 
     # Dofuslab sets
-    dofuslab_json = open("input/dofuslab/sets.json")
-    dofuslab_sets_json = json.load(dofuslab_json)
-    dofuslab_json.close()
+    dofuslab_sets_json = []
+    if not args.ignore_dofuslab:
+        dofuslab_json = open("input/dofuslab/sets.json")
+        dofuslab_sets_json = json.load(dofuslab_json)
+        dofuslab_json.close()
 
     # sort sets for convenience and consistency of output:
     en_dofusdude_data["sets"] = sorted(en_dofusdude_data["sets"], key=lambda k: k["ankama_id"])
