@@ -1,69 +1,33 @@
 #!/usr/bin/env python3
 
+from os import path, makedirs
 import json
+import argparse
 import logging
 import coloredlogs
 from constants import NORMAL_STAT_MAP
 
-from fetch import get_set_files, get_dofuslab_files
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
-coloredlogs.install(level="DEBUG", logger=logger, fmt="%(asctime)s %(levelname)s %(message)s")
+coloredlogs.install(level="INFO", logger=logger, fmt="%(asctime)s %(levelname)s %(message)s")
 
+# from fetch import get_set_files, get_dofuslab_files
 # try:
 #     get_set_files()
 #     # get_dofuslab_files()
 # except Exception as e:
 #     logger.error(f"An error occurred: {str(e)}")
 
-# Opening all languages in order to populate localized names
-# This will be a list of requests in the future, not so many files being opened
-dofusdude_json_en = open("input/dofusdude/sets/en_all.json")
-en_dofusdude_data = json.load(dofusdude_json_en)
-dofusdude_json_en.close()
 
-dofusdude_json_fr = open("input/dofusdude/sets/fr_all.json")
-fr_dofusdude_data = json.load(dofusdude_json_fr)
-dofusdude_json_fr.close()
-
-dofusdude_json_es = open("input/dofusdude/sets/es_all.json")
-es_dofusdude_data = json.load(dofusdude_json_es)
-dofusdude_json_es.close()
-
-dofusdude_json_pt = open("input/dofusdude/sets/pt_all.json")
-pt_dofusdude_data = json.load(dofusdude_json_pt)
-dofusdude_json_pt.close()
-
-dofusdude_json_de = open("input/dofusdude/sets/de_all.json")
-de_dofusdude_data = json.load(dofusdude_json_de)
-dofusdude_json_de.close()
-
-dofusdude_json_it = open("input/dofusdude/sets/it_all.json")
-it_dofusdude_data = json.load(dofusdude_json_it)
-dofusdude_json_it.close()
-
-# Dofuslab sets
-dofuslab_json = open("input/dofuslab/sets.json")
-dofuslab_sets_json = json.load(dofuslab_json)
-dofuslab_json.close()
-
-# List of sets
-final_sets = []
-
-# sort sets for convenience and consistency of output:
-en_dofusdude_data["sets"] = sorted(en_dofusdude_data["sets"], key=lambda k: k["ankama_id"])
-dofuslab_sets_json = sorted(dofuslab_sets_json, key=lambda d: d["id"])
-
-
-def item_exists(name):
+def item_exists(name, dofuslab_sets_json):
     for i in dofuslab_sets_json:
         if i["name"]["en"] == name:
             return True
 
 
-def remove_item(name):
+def remove_item(name, dofuslab_sets_json):
     for i in dofuslab_sets_json:
         if i["name"]["en"] == name:
             dofuslab_sets_json.remove(i)
@@ -103,27 +67,40 @@ def generate_set_bonuses(bonuses):
     return transformed
 
 
-def transform_sets(skip: bool = True, replace: bool = False):
-    for set in en_dofusdude_data["sets"]:
-        logger.info(f"Transforming {set["name"]}...")
-        logger.debug(f"Set: {set}")
+def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replace: bool = False):
+    en_dofusdude_data = dofusdude_data["en"]
+    fr_dofusdude_data = dofusdude_data["fr"]
+    es_dofusdude_data = dofusdude_data["es"]
+    de_dofusdude_data = dofusdude_data["de"]
+    it_dofusdude_data = dofusdude_data["it"]
+    pt_dofusdude_data = dofusdude_data["pt"]
 
+    # List of sets
+    final_sets = []
+
+    if not path.exists("output"):
+        makedirs("output")
+
+    for set in en_dofusdude_data["sets"]:
         # skip set if the name contains " Ceremonial Set"
         if " Ceremonial Set" in set["name"]:
-            logger.info(f"Skipping set {set["name"]}")
+            logger.info(f"Skipping: {set["name"]}")
             continue
 
-        if replace and item_exists(set["name"]):
+        logger.info(f"Transforming: {set["name"]}")
+        logger.debug(f"Set data: {set}")
+
+        if replace and item_exists(set["name"], dofuslab_sets_json):
             # replace set if it already exists
             logger.debug(f"Set {set["name"]} already exists, removing from array to replace with doduda...")
-            remove_item(set["name"])
+            remove_item(set["name"], dofuslab_sets_json)
 
-        if skip and item_exists(set["name"]):
+        if skip and item_exists(set["name"], dofuslab_sets_json):
             # skip set if it already exists
             continue
 
         if "effects" in set:
-            logger.info("Adding {} to items...".format(set["name"]))
+            logger.debug(f"Adding {set["name"]}...")
 
             # Locales
             en_set = find_localized_item(set["ankama_id"], en_dofusdude_data["sets"])
@@ -146,11 +123,91 @@ def transform_sets(skip: bool = True, replace: bool = False):
                 "bonuses": generate_set_bonuses(en_set["effects"]),
             }
             final_sets.append(rebuilt_set)
-            logger.info("Added {} to items".format(set["name"]))
+            logger.info(f"Transformed:  {set["name"]}.")
 
         with open("output/sets.json", "w+", encoding="utf8") as outfile:
             outfile.write(json.dumps(dofuslab_sets_json + final_sets, ensure_ascii=False, indent=4))
             outfile.close()
 
 
-__main__ = transform_sets(skip=False, replace=True)
+# __main__ = transform_sets(skip=False, replace=True)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Transforms sets json data from doduda into dofuslab format",
+    )
+    parser.add_argument(
+        "-s",
+        "--skip",
+        action="store_true",
+        help="Skips elements that already exist in the dofuslab data",
+        default=False,
+    )
+    parser.add_argument(
+        "-r",
+        "--replace",
+        action="store_true",
+        help="Replaces elements if they already exist in the dofuslab data",
+        default=False,
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Enables debug output including raw set json", default=False
+    )
+
+    args = parser.parse_args()
+
+    logger.info("Note: this assumes set data has been downloaded via fetch.py")
+
+    if args.verbose:
+        logger.setLevel(logging.DEBUG)
+        coloredlogs.install(level="DEBUG", logger=logger, fmt="%(asctime)s %(levelname)s %(message)s")
+
+    # Opening all languages in order to populate localized names
+    # This will be a list of requests in the future, not so many files being opened
+    dofusdude_json_en = open("input/dofusdude/sets/en_all.json")
+    en_dofusdude_data = json.load(dofusdude_json_en)
+    dofusdude_json_en.close()
+
+    dofusdude_json_fr = open("input/dofusdude/sets/fr_all.json")
+    fr_dofusdude_data = json.load(dofusdude_json_fr)
+    dofusdude_json_fr.close()
+
+    dofusdude_json_es = open("input/dofusdude/sets/es_all.json")
+    es_dofusdude_data = json.load(dofusdude_json_es)
+    dofusdude_json_es.close()
+
+    dofusdude_json_pt = open("input/dofusdude/sets/pt_all.json")
+    pt_dofusdude_data = json.load(dofusdude_json_pt)
+    dofusdude_json_pt.close()
+
+    dofusdude_json_de = open("input/dofusdude/sets/de_all.json")
+    de_dofusdude_data = json.load(dofusdude_json_de)
+    dofusdude_json_de.close()
+
+    dofusdude_json_it = open("input/dofusdude/sets/it_all.json")
+    it_dofusdude_data = json.load(dofusdude_json_it)
+    dofusdude_json_it.close()
+
+    # Dofuslab sets
+    dofuslab_json = open("input/dofuslab/sets.json")
+    dofuslab_sets_json = json.load(dofuslab_json)
+    dofuslab_json.close()
+
+    # sort sets for convenience and consistency of output:
+    en_dofusdude_data["sets"] = sorted(en_dofusdude_data["sets"], key=lambda k: k["ankama_id"])
+    dofuslab_sets_json = sorted(dofuslab_sets_json, key=lambda d: d["id"])
+
+    dofusdude_data = {}
+    dofusdude_data["en"] = en_dofusdude_data
+    dofusdude_data["fr"] = fr_dofusdude_data
+    dofusdude_data["es"] = es_dofusdude_data
+    dofusdude_data["de"] = de_dofusdude_data
+    dofusdude_data["it"] = it_dofusdude_data
+    dofusdude_data["pt"] = pt_dofusdude_data
+
+    transform_sets(dofusdude_data, dofuslab_sets_json, skip=args.skip, replace=args.replace)
+
+
+if __name__ == "__main__":
+    main()
