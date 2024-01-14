@@ -74,37 +74,37 @@ def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replac
     if not path.exists("output"):
         makedirs("output")
 
-    for set in dofusdude_data["en"]["sets"]:
+    for dset in dofusdude_data["en"]["sets"]:
         # skip set if the name contains " Ceremonial Set" - the leading space is important
-        if " Ceremonial Set" in set["name"]:
-            logger.info(f"Skipping: {set["name"]}")
+        if " Ceremonial Set" in dset["name"]:
+            logger.info(f"Skipping: {dset["name"]}")
             continue
 
-        logger.info(f"Transforming: {set["name"]}")
-        logger.debug(f"Set data: {set}")
+        logger.info(f"Transforming: {dset["name"]}")
+        logger.debug(f"Set data: {dset}")
 
-        if replace and item_exists(set["name"], dofuslab_sets_json):
+        if replace and item_exists(dset["name"], dofuslab_sets_json):
             # replace set if it already exists
-            logger.debug(f"Set {set["name"]} already exists, removing from array to replace with doduda...")
-            remove_item(set["name"], dofuslab_sets_json)
+            logger.debug(f"Set {dset["name"]} already exists, removing from array to replace with doduda...")
+            remove_item(dset["name"], dofuslab_sets_json)
 
-        if skip and item_exists(set["name"], dofuslab_sets_json):
+        if skip and item_exists(dset["name"], dofuslab_sets_json):
             # skip set if it already exists
             continue
 
-        if "effects" in set:
-            logger.debug(f"Adding {set["name"]}...")
+        if "effects" in dset:
+            logger.debug(f"Adding {dset["name"]}...")
 
             # Locales
-            en_set = find_localized_item(set["ankama_id"], dofusdude_data["en"]["sets"])
-            fr_set = find_localized_item(set["ankama_id"], dofusdude_data["fr"]["sets"])
-            es_set = find_localized_item(set["ankama_id"], dofusdude_data["es"]["sets"])
-            de_set = find_localized_item(set["ankama_id"], dofusdude_data["de"]["sets"])
-            it_set = find_localized_item(set["ankama_id"], dofusdude_data["it"]["sets"])
-            pt_set = find_localized_item(set["ankama_id"], dofusdude_data["pt"]["sets"])
+            en_set = find_localized_item(dset["ankama_id"], dofusdude_data["en"]["sets"])
+            fr_set = find_localized_item(dset["ankama_id"], dofusdude_data["fr"]["sets"])
+            es_set = find_localized_item(dset["ankama_id"], dofusdude_data["es"]["sets"])
+            de_set = find_localized_item(dset["ankama_id"], dofusdude_data["de"]["sets"])
+            it_set = find_localized_item(dset["ankama_id"], dofusdude_data["it"]["sets"])
+            pt_set = find_localized_item(dset["ankama_id"], dofusdude_data["pt"]["sets"])
 
             rebuilt_set = {
-                "id": set["ankama_id"],
+                "id": str(dset["ankama_id"]),
                 "name": {
                     "en": en_set["name"],
                     "fr": fr_set["name"],
@@ -116,11 +116,11 @@ def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replac
                 "bonuses": generate_set_bonuses(en_set["effects"]),
             }
             final_sets.append(rebuilt_set)
-            logger.info(f"Transformed:  {set["name"]}.")
+            logger.info(f"Transformed:  {dset["name"]}.")
 
-        with open("output/sets.json", "w+", encoding="utf8") as outfile:
-            outfile.write(json.dumps(dofuslab_sets_json + final_sets, ensure_ascii=False, indent=4))
-            outfile.close()
+    with open("output/sets.json", "w+", encoding="utf8") as outfile:
+        outfile.write(json.dumps(dofuslab_sets_json + final_sets, ensure_ascii=False, indent=4))
+        outfile.close()
 
 
 # __main__ = transform_sets(skip=False, replace=True)

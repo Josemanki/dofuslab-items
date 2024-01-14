@@ -2,6 +2,9 @@
 
 from os import path, makedirs
 import json
+import argparse
+import logging
+import coloredlogs
 import requests
 from constants import (
     CUSTOM_STAT_MAP,
@@ -11,98 +14,63 @@ from constants import (
     WEAPON_STAT_MAP,
     IGNORED_CATEGORIES,
 )
-from fetch import get_item_files
 
-try:
-    get_item_files()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
-except Exception as e:
-    print(f"An error occurred: {str(e)}")
+coloredlogs.install(level="INFO", logger=logger, fmt="%(asctime)s %(levelname)s %(message)s")
 
-# Opening all languages in order to populate localized names
-# This will be a list of requests in the future, not so many files being opened
-
-dofusdude_json_en = open("input/dofusdude/equipment/en_all.json")
-en_dofusdude_data = json.load(dofusdude_json_en)
-dofusdude_json_en.close()
-
-dofusdude_json_fr = open("input/dofusdude/equipment/fr_all.json")
-fr_dofusdude_data = json.load(dofusdude_json_fr)
-dofusdude_json_fr.close()
-
-dofusdude_json_es = open("input/dofusdude/equipment/es_all.json")
-es_dofusdude_data = json.load(dofusdude_json_es)
-dofusdude_json_es.close()
-
-dofusdude_json_pt = open("input/dofusdude/equipment/pt_all.json")
-pt_dofusdude_data = json.load(dofusdude_json_pt)
-dofusdude_json_pt.close()
-
-dofusdude_json_de = open("input/dofusdude/equipment/de_all.json")
-de_dofusdude_data = json.load(dofusdude_json_de)
-dofusdude_json_de.close()
-
-dofusdude_json_it = open("input/dofusdude/equipment/it_all.json")
-it_dofusdude_data = json.load(dofusdude_json_it)
-dofusdude_json_it.close()
-
-# All DofusLab data to be compiled together
-dofuslab_full_data = []
-
-# Opens all Dofuslab data files and aggregates them
-dofuslab_current_items = open("input/dofuslab/items.json", "r")
-serialized_current_items = json.load(dofuslab_current_items)
-dofuslab_current_items.close()
-
-dofuslab_current_mounts = open("input/dofuslab/mounts.json", "r")
-serialized_current_mounts = json.load(dofuslab_current_mounts)
-dofuslab_current_mounts.close()
-
-dofuslab_current_pets = open("input/dofuslab/pets.json", "r")
-serialized_current_pets = json.load(dofuslab_current_pets)
-dofuslab_current_pets.close()
-
-dofuslab_current_rhineetles = open("input/dofuslab/rhineetles.json", "r")
-serialized_current_rhineetles = json.load(dofuslab_current_rhineetles)
-dofuslab_current_rhineetles.close()
-
-dofuslab_current_weapons = open("input/dofuslab/weapons.json", "r")
-serialized_current_weapons = json.load(dofuslab_current_weapons)
-dofuslab_current_weapons.close()
-
-dofuslab_full_data = (
-    serialized_current_items
-    + serialized_current_mounts
-    + serialized_current_pets
-    + serialized_current_rhineetles
-    + serialized_current_weapons
-)
-
-# Maps everything to their json file
-final_items = []
-final_weapons = []
-final_mounts = []
-final_rhineetles = []
-final_pets = []
+# from fetch import get_item_files
+# try:
+#     get_item_files()
+# except Exception as e:
+#     print(f"An error occurred: {str(e)}")
 
 
-def item_exists(name):
-    for i in dofuslab_full_data:
-        if i["name"]["en"] == name:
-            return True
+def item_exists(name, dofuslab_data):
+    # item_types = {"items", "mounts", "pets", "rhineetles", "weapons"}
+    for item_type in dofuslab_data:
+        for i in dofuslab_data[item_type]:
+            if i["name"]["en"] == name:
+                return True
 
 
-def categorize_item(item):
+def remove_item(name, dofuslab_data):
+    for item_type in dofuslab_data:
+        for i in dofuslab_data[item_type]:
+            if i["name"]["en"] == name:
+                dofuslab_data[item_type].remove(i)
+                break
+
+
+def categorize_item(item, data):
+    """
+    Adds the item to the appropriate list in data
+    """
     if item["itemType"] in PET_ITEM_TYPES:
-        final_pets.append(item)
+        data["pets"].append(item)
+        logger.info(f"Added:  {item["name"]["en"]} to pets")
+
     elif item["itemType"] in WEAPON_TYPES:
-        final_weapons.append(item)
+        data["weapons"].append(item)
+        logger.info(f"Added:  {item["name"]["en"]} to weapons")
+
     elif item["itemType"] == "Mount" and item["name"]["en"].contains("Rhineetle"):
-        final_rhineetles.append(item)
+        data["rhineetles"].append(item)
+        logger.info(f"Added:  {item["name"]["en"]} to rhineetles")
+
     elif item["itemType"] == "Mount":
-        final_mounts.append(item)
+        data["mounts"].append(item)
+        logger.info(f"Added:  {item["name"]["en"]} to mounts")
+
     else:
-        final_items.append(item)
+        # itemType can be "Cloak", etc
+        data["items"].append(item)
+        logger.info(f"Added:  {item["name"]["en"]} to items")
+
+
+def format_image(image_urls):
+    return image_urls["sd"].split("item/")[1]
 
 
 def format_image_and_download(image_urls):
@@ -175,7 +143,7 @@ def find_localized_item(item_id, language_data):
         found = next(item for item in language_data if item["ankama_id"] == item_id)
         return found
     except StopIteration:
-        print("Not found!")
+        logger.warning(f"Localization not found for id {item_id}")
 
 
 def localize_custom_stats_from_id(stat_ids, item_stats):
@@ -188,24 +156,35 @@ def localize_custom_stats_from_id(stat_ids, item_stats):
     return custom_stats
 
 
-def transform_items():
-    for item in en_dofusdude_data["items"]:
-        if item_exists(item["name"]):
+def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, download_imgs=False):
+    # dictionary of lists of items
+    final_data = {}
+    for item_type in {"items", "mounts", "pets", "rhineetles", "weapons"}:
+        final_data[item_type] = []
+
+    if not path.exists("output"):
+        makedirs("output")
+
+    for item in dofusdude_data["en"]["items"]:
+        if skip and item_exists(item["name"], dofuslab_data):
+            logger.info(f"Skipping: {item["name"]}")
             continue
+        if replace and item_exists(item["name"], dofuslab_data):
+            remove_item(item["name"], dofuslab_data)
         elif item["is_weapon"]:
             # WEAPON TRANSFORMATION
             if "effects" in item and item["type"]["name"] not in IGNORED_CATEGORIES:
-                print("Adding {} to items...".format(item["name"]))
+                logger.debug(f"Adding: {item["name"]}")
                 item_effects = transform_stats(item["effects"])
                 custom_stats = {}
 
                 # Locales
-                en_item = find_localized_item(item["ankama_id"], en_dofusdude_data["items"])
-                fr_item = find_localized_item(item["ankama_id"], fr_dofusdude_data["items"])
-                es_item = find_localized_item(item["ankama_id"], es_dofusdude_data["items"])
-                de_item = find_localized_item(item["ankama_id"], de_dofusdude_data["items"])
-                it_item = find_localized_item(item["ankama_id"], it_dofusdude_data["items"])
-                pt_item = find_localized_item(item["ankama_id"], pt_dofusdude_data["items"])
+                en_item = find_localized_item(item["ankama_id"], dofusdude_data["en"]["items"])
+                fr_item = find_localized_item(item["ankama_id"], dofusdude_data["fr"]["items"])
+                es_item = find_localized_item(item["ankama_id"], dofusdude_data["es"]["items"])
+                de_item = find_localized_item(item["ankama_id"], dofusdude_data["de"]["items"])
+                it_item = find_localized_item(item["ankama_id"], dofusdude_data["it"]["items"])
+                pt_item = find_localized_item(item["ankama_id"], dofusdude_data["pt"]["items"])
 
                 if "en" in item_effects["customStats"]:
                     custom_stats = {
@@ -218,7 +197,8 @@ def transform_items():
                     }
 
                 rebuilt_item = {
-                    "dofusID": str(item["ankama_id"]),
+                    # "dofusID": str(item["ankama_id"]),
+                    "dofusID": item["ankama_id"],
                     "name": {
                         "en": en_item["name"],
                         "fr": fr_item["name"],
@@ -242,24 +222,25 @@ def transform_items():
                     },
                     "customStats": custom_stats,
                     "conditions": transform_conditions(item["conditions"]) if "conditions" in item else {},
-                    "image": format_image_and_download(item["image_urls"]),
+                    "image": format_image(item["image_urls"]),
                 }
-                categorize_item(rebuilt_item)
-                print("Added {} to items".format(item["name"]))
+                categorize_item(rebuilt_item, final_data)
+                if download_imgs:
+                    format_image_and_download(item["image_urls"])
         else:
             # ITEM TRANSFORMATION
             if "effects" in item and item["type"]["name"] not in IGNORED_CATEGORIES:
-                print("Adding {} to items...".format(item["name"]))
+                logger.debug(f"Adding: {item["name"]}")
                 item_effects = transform_stats(item["effects"])
                 custom_stats = {}
 
                 # Locales
-                en_item = find_localized_item(item["ankama_id"], en_dofusdude_data["items"])
-                fr_item = find_localized_item(item["ankama_id"], fr_dofusdude_data["items"])
-                es_item = find_localized_item(item["ankama_id"], es_dofusdude_data["items"])
-                de_item = find_localized_item(item["ankama_id"], de_dofusdude_data["items"])
-                it_item = find_localized_item(item["ankama_id"], it_dofusdude_data["items"])
-                pt_item = find_localized_item(item["ankama_id"], pt_dofusdude_data["items"])
+                en_item = find_localized_item(item["ankama_id"], dofusdude_data["en"]["items"])
+                fr_item = find_localized_item(item["ankama_id"], dofusdude_data["fr"]["items"])
+                es_item = find_localized_item(item["ankama_id"], dofusdude_data["es"]["items"])
+                de_item = find_localized_item(item["ankama_id"], dofusdude_data["de"]["items"])
+                it_item = find_localized_item(item["ankama_id"], dofusdude_data["it"]["items"])
+                pt_item = find_localized_item(item["ankama_id"], dofusdude_data["pt"]["items"])
 
                 if "en" in item_effects["customStats"]:
                     custom_stats = {
@@ -272,7 +253,8 @@ def transform_items():
                     }
 
                 rebuilt_item = {
-                    "dofusID": str(item["ankama_id"]),
+                    # "dofusID": str(item["ankama_id"]),
+                    "dofusID": item["ankama_id"],
                     "name": {
                         "en": en_item["name"],
                         "fr": fr_item["name"],
@@ -287,30 +269,159 @@ def transform_items():
                     "stats": item_effects["stats"],
                     "customStats": custom_stats,
                     "conditions": transform_conditions(item["conditions"]) if "conditions" in item else {},
-                    "image": format_image_and_download(item["image_urls"]),
+                    "image": format_image(item["image_urls"]),
                 }
-                categorize_item(rebuilt_item)
-                print("Added {} to items".format(item["name"]))
+                categorize_item(rebuilt_item, final_data)
+                if download_imgs:
+                    format_image_and_download(item["image_urls"])
 
-        with open("output/items.json", "w+", encoding="utf8") as outfile:
-            outfile.write(json.dumps(serialized_current_items + final_items, ensure_ascii=False))
-            outfile.close()
+    with open("output/items.json", "w+", encoding="utf8") as outfile:
+        outfile.write(json.dumps(dofuslab_data["items"] + final_data["items"], indent=4, ensure_ascii=False))
+        outfile.close()
 
-        with open("output/mounts.json", "w+", encoding="utf8") as outfile:
-            outfile.write(json.dumps(serialized_current_mounts + final_mounts, ensure_ascii=False))
-            outfile.close()
+    with open("output/mounts.json", "w+", encoding="utf8") as outfile:
+        outfile.write(json.dumps(dofuslab_data["mounts"] + final_data["mounts"], indent=4, ensure_ascii=False))
+        outfile.close()
 
-        with open("output/pets.json", "w+", encoding="utf8") as outfile:
-            outfile.write(json.dumps(serialized_current_pets + final_pets, ensure_ascii=False))
-            outfile.close()
+    with open("output/pets.json", "w+", encoding="utf8") as outfile:
+        outfile.write(json.dumps(dofuslab_data["pets"] + final_data["pets"], indent=4, ensure_ascii=False))
+        outfile.close()
 
-        with open("output/rhineetles.json", "w+", encoding="utf8") as outfile:
-            outfile.write(json.dumps(serialized_current_rhineetles + final_rhineetles, ensure_ascii=False))
-            outfile.close()
+    with open("output/rhineetles.json", "w+", encoding="utf8") as outfile:
+        outfile.write(json.dumps(dofuslab_data["rhineetles"] + final_data["rhineetles"], indent=4, ensure_ascii=False))
+        outfile.close()
 
-        with open("output/weapons.json", "w+", encoding="utf8") as outfile:
-            outfile.write(json.dumps(serialized_current_weapons + final_weapons, ensure_ascii=False))
-            outfile.close()
+    with open("output/weapons.json", "w+", encoding="utf8") as outfile:
+        outfile.write(json.dumps(dofuslab_data["weapons"] + final_data["weapons"], indent=4, ensure_ascii=False))
+        outfile.close()
 
 
-__main__ = transform_items()
+def main():
+    parser = argparse.ArgumentParser(
+        description="Transforms sets json data from doduda into dofuslab format",
+    )
+    parser.add_argument(
+        "-s",
+        "--skip",
+        action="store_true",
+        help="Skips elements that already exist in the dofuslab data",
+        default=False,
+    )
+    parser.add_argument(
+        "-r",
+        "--replace",
+        action="store_true",
+        help="Replaces elements if they already exist in the dofuslab data",
+        default=False,
+    )
+    parser.add_argument("-v", "--verbose", action="store_true", help="Enables verbose debug output", default=False)
+    parser.add_argument(
+        "-i",
+        "--ignore_dofuslab",
+        action="store_true",
+        help="Ignores dofuslab data and regenerates entirely from doduda",
+        default=False,
+    )
+    parser.add_argument(
+        "-d",
+        "--download_imgs",
+        action="store_true",
+        help="Downloads images from doduda for items",
+        default=False,
+    )
+
+    args = parser.parse_args()
+
+    logger.info("Note: this assumes set data has been downloaded via fetch.py")
+
+    if args.verbose:
+        logger.setLevel(logging.DEBUG)
+        coloredlogs.install(level="DEBUG", logger=logger, fmt="%(asctime)s %(levelname)s %(message)s")
+
+    # Opening all languages in order to populate localized names
+    # This will be a list of requests in the future, not so many files being opened
+
+    dofusdude_json_en = open("input/dofusdude/equipment/en_all.json")
+    en_dofusdude_data = json.load(dofusdude_json_en)
+    dofusdude_json_en.close()
+
+    dofusdude_json_fr = open("input/dofusdude/equipment/fr_all.json")
+    fr_dofusdude_data = json.load(dofusdude_json_fr)
+    dofusdude_json_fr.close()
+
+    dofusdude_json_es = open("input/dofusdude/equipment/es_all.json")
+    es_dofusdude_data = json.load(dofusdude_json_es)
+    dofusdude_json_es.close()
+
+    dofusdude_json_pt = open("input/dofusdude/equipment/pt_all.json")
+    pt_dofusdude_data = json.load(dofusdude_json_pt)
+    dofusdude_json_pt.close()
+
+    dofusdude_json_de = open("input/dofusdude/equipment/de_all.json")
+    de_dofusdude_data = json.load(dofusdude_json_de)
+    dofusdude_json_de.close()
+
+    dofusdude_json_it = open("input/dofusdude/equipment/it_all.json")
+    it_dofusdude_data = json.load(dofusdude_json_it)
+    dofusdude_json_it.close()
+
+    # sort for convenience and consistency of output:
+    en_dofusdude_data["items"] = sorted(en_dofusdude_data["items"], key=lambda k: k["ankama_id"])
+    fr_dofusdude_data["items"] = sorted(fr_dofusdude_data["items"], key=lambda k: k["ankama_id"])
+    es_dofusdude_data["items"] = sorted(es_dofusdude_data["items"], key=lambda k: k["ankama_id"])
+    de_dofusdude_data["items"] = sorted(de_dofusdude_data["items"], key=lambda k: k["ankama_id"])
+    it_dofusdude_data["items"] = sorted(it_dofusdude_data["items"], key=lambda k: k["ankama_id"])
+    pt_dofusdude_data["items"] = sorted(pt_dofusdude_data["items"], key=lambda k: k["ankama_id"])
+
+    dofusdude_data = {}
+    dofusdude_data["en"] = en_dofusdude_data
+    dofusdude_data["fr"] = fr_dofusdude_data
+    dofusdude_data["es"] = es_dofusdude_data
+    dofusdude_data["de"] = de_dofusdude_data
+    dofusdude_data["it"] = it_dofusdude_data
+    dofusdude_data["pt"] = pt_dofusdude_data
+
+    # All DofusLab data to be compiled together
+    dofuslab_data = {}
+
+    dofuslab_data["items"] = []
+    dofuslab_data["mounts"] = []
+    dofuslab_data["pets"] = []
+    dofuslab_data["rhineetles"] = []
+    dofuslab_data["weapons"] = []
+
+    if not args.ignore_dofuslab:
+        # Opens all Dofuslab data files and aggregates them
+        dofuslab_current_items = open("input/dofuslab/items.json", "r")
+        current_dl_items = json.load(dofuslab_current_items)
+        dofuslab_current_items.close()
+
+        dofuslab_current_mounts = open("input/dofuslab/mounts.json", "r")
+        current_dl_mounts = json.load(dofuslab_current_mounts)
+        dofuslab_current_mounts.close()
+
+        dofuslab_current_pets = open("input/dofuslab/pets.json", "r")
+        current_dl_pets = json.load(dofuslab_current_pets)
+        dofuslab_current_pets.close()
+
+        dofuslab_current_rhineetles = open("input/dofuslab/rhineetles.json", "r")
+        current_dl_rhineetles = json.load(dofuslab_current_rhineetles)
+        dofuslab_current_rhineetles.close()
+
+        dofuslab_current_weapons = open("input/dofuslab/weapons.json", "r")
+        current_dl_weapons = json.load(dofuslab_current_weapons)
+        dofuslab_current_weapons.close()
+
+        dofuslab_data["items"] = current_dl_items
+        dofuslab_data["mounts"] = current_dl_mounts
+        dofuslab_data["pets"] = current_dl_pets
+        dofuslab_data["rhineetles"] = current_dl_rhineetles
+        dofuslab_data["weapons"] = current_dl_weapons
+
+    transform_items(
+        dofusdude_data, dofuslab_data, skip=args.skip, replace=args.replace, download_imgs=args.download_imgs
+    )
+
+
+if __name__ == "__main__":
+    main()
