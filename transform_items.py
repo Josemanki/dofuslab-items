@@ -14,7 +14,7 @@ from constants import (
     WEAPON_STAT_MAP,
     IGNORED_CATEGORIES,
     IGNORED_ITEM_TYPES,
-    IGNORED_ITEMS,
+    IGNORED_ITEM_IDS,
     )
 
 logger = logging.getLogger(__name__)
@@ -179,7 +179,7 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
         elif item["type"]["name"] in IGNORED_ITEM_TYPES:
             logger.info(f"Skipping: {item["name"]}")
             continue
-        elif item["name"] in IGNORED_ITEMS:
+        elif item["ankama_id"] in IGNORED_ITEM_IDS:
             logger.info(f"Skipping: {item["name"]}")
             continue
         elif item["is_weapon"]:
@@ -231,7 +231,7 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
                         "weapon_effects": item_effects["weaponStats"],
                     },
                     "customStats": custom_stats,
-                    "conditions": transform_conditions(item["conditions"]) if "conditions" in item else {},
+                    "conditions": transform_conditions(item["conditions"]) if "conditions" in item else {"conditions": {}, "customConditions": {}},
                     "imageUrl": format_image(item["image_urls"]),
                 }
                 categorize_item(rebuilt_item, final_data)
@@ -277,7 +277,7 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
                     "level": item["level"],
                     "stats": item_effects["stats"],
                     "customStats": custom_stats,
-                    "conditions": transform_conditions(item["conditions"]) if "conditions" in item else {},
+                    "conditions": transform_conditions(item["conditions"]) if "conditions" in item else {"conditions": {}, "customConditions": {}},
                     "imageUrl": format_image(item["image_urls"]),
                 }
                 categorize_item(rebuilt_item, final_data)

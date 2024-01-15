@@ -220,14 +220,21 @@ IGNORED_ITEM_TYPES = [
     "Badge"
 ]
 
-IGNORED_ITEMS = [
-    "Docile Yakitoro",
-    "Ruminant Yakitoro",
-    "Horned Yakitoro",
-    "Slugger Yakitoro",
-    "Hard-Charging Yakitoro",
-    "Skewer-Happy Yakitoro"
+IGNORED_ITEM_IDS = [
+    29115, # Naive Yakitoro
+    29120, # Innocent Yakitoro
+    29122, # Carefree Yakitoro
+    29194, # Docile Yakitoro
+    29216, # Ruminant Yakitoro
+    29219, # Horned Yakitoro
+    29221, # Slugger Yakitoro
+    29223, # Hard-Charging Yakitoro
+    29225, # Skewer-Happy Yakitoro
+    21186, # Vulbis Dofus (quest version)
+    29134, # Sylvan Dofus (quest version)
+    # 29135, # Verdant Dofus (quest item)
 ]
+
 
 SETS_BASE_URL = "https://api.dofusdu.de/dofus2/{}/sets/all"
 ITEMS_BASE_URL = "https://api.dofusdu.de/dofus2/{}/items/equipment/all"
