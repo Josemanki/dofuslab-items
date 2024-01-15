@@ -233,6 +233,9 @@ IGNORED_ITEM_IDS = [
     21186, # Vulbis Dofus (quest version)
     29134, # Sylvan Dofus (quest version)
     # 29135, # Verdant Dofus (quest item)
+    6894, # Ultra-powerful Combat Bow Meow (GM)
+    6895, # Small Combat Bow Meow (GM)
+    7913, # Animagi (GM)
 ]
 
 

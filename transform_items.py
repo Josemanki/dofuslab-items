@@ -15,7 +15,7 @@ from constants import (
     IGNORED_CATEGORIES,
     IGNORED_ITEM_TYPES,
     IGNORED_ITEM_IDS,
-    )
+)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -231,7 +231,9 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
                         "weapon_effects": item_effects["weaponStats"],
                     },
                     "customStats": custom_stats,
-                    "conditions": transform_conditions(item["conditions"]) if "conditions" in item else {"conditions": {}, "customConditions": {}},
+                    "conditions": transform_conditions(item["conditions"])
+                    if "conditions" in item
+                    else {"conditions": {}, "customConditions": {}},
                     "imageUrl": format_image(item["image_urls"]),
                 }
                 categorize_item(rebuilt_item, final_data)
@@ -277,12 +279,23 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
                     "level": item["level"],
                     "stats": item_effects["stats"],
                     "customStats": custom_stats,
-                    "conditions": transform_conditions(item["conditions"]) if "conditions" in item else {"conditions": {}, "customConditions": {}},
+                    "conditions": transform_conditions(item["conditions"])
+                    if "conditions" in item
+                    else {"conditions": {}, "customConditions": {}},
                     "imageUrl": format_image(item["image_urls"]),
                 }
                 categorize_item(rebuilt_item, final_data)
                 if download_imgs:
                     format_image_and_download(item["image_urls"])
+
+    # more processing to remove extra conditions on items:
+    for item in final_data["pets"]:
+        # for some reason, we have a "= 0" condition on our petsmounts
+        conds_to_remove = {"conditions": {"and": [{"stat": "", "operator": "=", "value": 1}]}, "customConditions": {}}
+        # remove it:
+        if item["conditions"] == conds_to_remove:
+            logger.info(f"Removing extraneous conditions on {item["name"]["en"]}")
+            item["conditions"] = {"conditions": {}, "customConditions": {}}
 
     with open("output/items.json", "w+", encoding="utf8") as outfile:
         outfile.write(json.dumps(dofuslab_data["items"] + final_data["items"], indent=4, ensure_ascii=False))
