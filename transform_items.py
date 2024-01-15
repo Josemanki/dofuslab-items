@@ -13,7 +13,9 @@ from constants import (
     WEAPON_TYPES,
     WEAPON_STAT_MAP,
     IGNORED_CATEGORIES,
-)
+    IGNORED_ITEM_TYPES,
+    IGNORED_ITEMS,
+    )
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -169,8 +171,14 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
         if skip and item_exists(item["name"], dofuslab_data):
             logger.info(f"Skipping: {item["name"]}")
             continue
-        if replace and item_exists(item["name"], dofuslab_data):
+        elif replace and item_exists(item["name"], dofuslab_data):
             remove_item(item["name"], dofuslab_data)
+        elif item["type"]["name"] in IGNORED_ITEM_TYPES:
+            logger.info(f"Skipping: {item["name"]}")
+            continue
+        elif item["name"] in IGNORED_ITEMS:
+            logger.info(f"Skipping: {item["name"]}")
+            continue
         elif item["is_weapon"]:
             # WEAPON TRANSFORMATION
             if "effects" in item and item["type"]["name"] not in IGNORED_CATEGORIES:
@@ -279,17 +287,19 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
         outfile.write(json.dumps(dofuslab_data["items"] + final_data["items"], indent=4, ensure_ascii=False))
         outfile.close()
 
-    with open("output/mounts.json", "w+", encoding="utf8") as outfile:
-        outfile.write(json.dumps(dofuslab_data["mounts"] + final_data["mounts"], indent=4, ensure_ascii=False))
-        outfile.close()
+    # this doesn't currently populate
+    # with open("output/mounts.json", "w+", encoding="utf8") as outfile:
+    #     outfile.write(json.dumps(dofuslab_data["mounts"] + final_data["mounts"], indent=4, ensure_ascii=False))
+    #     outfile.close()
 
     with open("output/pets.json", "w+", encoding="utf8") as outfile:
         outfile.write(json.dumps(dofuslab_data["pets"] + final_data["pets"], indent=4, ensure_ascii=False))
         outfile.close()
 
-    with open("output/rhineetles.json", "w+", encoding="utf8") as outfile:
-        outfile.write(json.dumps(dofuslab_data["rhineetles"] + final_data["rhineetles"], indent=4, ensure_ascii=False))
-        outfile.close()
+    # this doesn't currently populate, so skip writing it
+    # with open("output/rhineetles.json", "w+", encoding="utf8") as outfile:
+    #     outfile.write(json.dumps(dofuslab_data["rhineetles"] + final_data["rhineetles"], indent=4, ensure_ascii=False))
+    #     outfile.close()
 
     with open("output/weapons.json", "w+", encoding="utf8") as outfile:
         outfile.write(json.dumps(dofuslab_data["weapons"] + final_data["weapons"], indent=4, ensure_ascii=False))

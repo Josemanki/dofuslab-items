@@ -192,6 +192,11 @@ WEAPON_TYPES = [
     "Wand",
 ]
 
+MOUNT_TYPES = [
+    "Dragoturkey Certificate",
+
+]
+
 IGNORED_CATEGORIES = [
     "Sidekick",
     "Tool",
@@ -201,6 +206,27 @@ IGNORED_CATEGORIES = [
     "Prysmaradite",
     "Magic weapon",
     "Expedition Idol",
+]
+
+IGNORED_ITEM_TYPES = [
+    "Perceptor Daggers",
+    "Perceptor Armour",
+    "Perceptor Chests",
+    "Perceptor Bags",
+    "Perceptor Shoes",
+    "Perceptor Tunic",
+    "Perceptor Banner",
+    # Temporis items:
+    "Badge"
+]
+
+IGNORED_ITEMS = [
+    "Docile Yakitoro",
+    "Ruminant Yakitoro",
+    "Horned Yakitoro",
+    "Slugger Yakitoro",
+    "Hard-Charging Yakitoro",
+    "Skewer-Happy Yakitoro"
 ]
 
 SETS_BASE_URL = "https://api.dofusdu.de/dofus2/{}/sets/all"
