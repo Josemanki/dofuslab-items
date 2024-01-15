@@ -91,6 +91,7 @@ def format_image_and_download(image_urls):
 
 
 def transform_conditions(conditions):
+    retConditions = {"conditions": {}}
     condition_list = {"and": []}
     for condition in conditions:
         condition_list["and"].append(
@@ -100,7 +101,9 @@ def transform_conditions(conditions):
                 "value": condition["int_value"],
             }
         )
-    return condition_list
+    retConditions["conditions"] = condition_list
+    retConditions["customConditions"] = {}
+    return retConditions
 
 
 def transform_stats(stats):
@@ -205,8 +208,7 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
                     }
 
                 rebuilt_item = {
-                    # "dofusID": str(item["ankama_id"]),
-                    "dofusID": item["ankama_id"],
+                    "dofusID": str(item["ankama_id"]),
                     "name": {
                         "en": en_item["name"],
                         "fr": fr_item["name"],
@@ -216,7 +218,7 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
                         "pt": pt_item["name"],
                     },
                     "itemType": item["type"]["name"],
-                    "setID": item["parent_set"]["id"] if "parent_set" in item else None,
+                    "setID": str(item["parent_set"]["id"]) if "parent_set" in item else None,
                     "level": item["level"],
                     "stats": item_effects["stats"],
                     "weaponStats": {
@@ -230,7 +232,7 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
                     },
                     "customStats": custom_stats,
                     "conditions": transform_conditions(item["conditions"]) if "conditions" in item else {},
-                    "image": format_image(item["image_urls"]),
+                    "imageUrl": format_image(item["image_urls"]),
                 }
                 categorize_item(rebuilt_item, final_data)
                 if download_imgs:
@@ -261,8 +263,7 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
                     }
 
                 rebuilt_item = {
-                    # "dofusID": str(item["ankama_id"]),
-                    "dofusID": item["ankama_id"],
+                    "dofusID": str(item["ankama_id"]),
                     "name": {
                         "en": en_item["name"],
                         "fr": fr_item["name"],
@@ -272,12 +273,12 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
                         "pt": pt_item["name"],
                     },
                     "itemType": item["type"]["name"],
-                    "setID": item["parent_set"]["id"] if "parent_set" in item else None,
+                    "setID": str(item["parent_set"]["id"]) if "parent_set" in item else None,
                     "level": item["level"],
                     "stats": item_effects["stats"],
                     "customStats": custom_stats,
                     "conditions": transform_conditions(item["conditions"]) if "conditions" in item else {},
-                    "image": format_image(item["image_urls"]),
+                    "imageUrl": format_image(item["image_urls"]),
                 }
                 categorize_item(rebuilt_item, final_data)
                 if download_imgs:
