@@ -72,7 +72,8 @@ def categorize_item(item, data):
 
 
 def format_image(image_urls):
-    return image_urls["sd"].split("item/")[1]
+    # return image_urls["sd"].split("item/")[1]
+    return "item/" + image_urls["icon"].split("item/")[1]
 
 
 def format_image_and_download(image_urls):

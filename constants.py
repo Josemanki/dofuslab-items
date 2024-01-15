@@ -65,7 +65,7 @@ WEAPON_STAT_MAP = {
 }
 
 CUSTOM_STAT_MAP = [
-    "Exchangeable:",
+    # "Exchangeable:",
     "Compatible with:",
     "% Critical Hit bonus on the spell",
     "Increases the spell's maximum range by",
@@ -86,7 +86,7 @@ CUSTOM_STAT_MAP = [
     "Learn the spell level",
     "XP",
     "What's in there?",
-    "emote",
+    # "emote",
     "Be level or higher",
     "Positions the compass",
     "No future smithmagic",
@@ -232,6 +232,7 @@ IGNORED_ITEM_IDS = [
     29225, # Skewer-Happy Yakitoro
     21186, # Vulbis Dofus (quest version)
     29134, # Sylvan Dofus (quest version)
+    29135, # Verdant Dofus (quest item, basically Pine Done)
     # 29135, # Verdant Dofus (quest item)
     6894, # Ultra-powerful Combat Bow Meow (GM)
     6895, # Small Combat Bow Meow (GM)
