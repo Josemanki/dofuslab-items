@@ -162,15 +162,48 @@ def localize_custom_stats_from_id(stat_ids, item_stats):
     return custom_stats
 
 
-def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, download_imgs=False):
-    # dictionary of lists of items
-    final_data = {}
-    for item_type in {"items", "mounts", "pets", "rhineetles", "weapons"}:
-        final_data[item_type] = []
+def get_dofuslab_titles_for_item(item_id, data_block, dofuslab_data):
+    ret_titles = {"en": "", "fr": "", "de": "", "es": "", "it": "", "pt": ""}
 
+    langs = ["en", "fr", "de", "es", "it", "pt"]
+    title_name = {"en": "Title", "fr": "Titre", "de": "Titel", "es": "Título", "it": "Titolo", "pt": "Título"}
+
+    for item in dofuslab_data[data_block]:
+        if int(item["dofusID"]) == item_id:
+            # sometimes we just don't have the title in the old data. In that case,
+            #  let's just remove the title.
+            if item["customStats"] == {}:
+                break
+            if isinstance(item["customStats"], list):
+                # for some reason, sometimes this is a list, not a dict?
+                break
+
+            # find the title within the custom stats, using our title_name to search
+            for lang in langs:
+
+                for entry in item["customStats"][lang]:
+                    if title_name[lang] in entry:
+                        ret_titles[lang] = entry
+                        break
+            # will break out of the inner loop, onto searching the next localization's data:
+            break
+
+    return ret_titles
+
+
+def transform_items(
+    dofusdude_data, dofuslab_data, skip=True, replace=False, download_imgs=False, import_titles=False
+):
+    # set up dictionary of lists of items
+    my_data = {}
+    for item_type in {"items", "mounts", "pets", "rhineetles", "weapons"}:
+        my_data[item_type] = []
+
+    # make the output path in case it doesn't exist:
     if not path.exists("output"):
         makedirs("output")
 
+    # for item in dofusdude_data["en"]["items"]:
     for item in dofusdude_data["en"]["items"]:
         if skip and item_exists(item["name"], dofuslab_data):
             logger.info(f"Skipping: {item["name"]}")
@@ -240,7 +273,7 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
                     else {"conditions": {}, "customConditions": {}},
                     "imageUrl": format_image(item["image_urls"]),
                 }
-                categorize_item(rebuilt_item, final_data)
+                categorize_item(rebuilt_item, my_data)
                 if download_imgs:
                     format_image_and_download(item["image_urls"])
         else:
@@ -291,12 +324,13 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
                     else {"conditions": {}, "customConditions": {}},
                     "imageUrl": format_image(item["image_urls"]),
                 }
-                categorize_item(rebuilt_item, final_data)
+                categorize_item(rebuilt_item, my_data)
                 if download_imgs:
                     format_image_and_download(item["image_urls"])
 
-    # more processing to remove extra conditions on items:
-    for item in final_data["pets"]:
+    # more processing to remove extra conditions on pets:
+    logger.info("Cleaning up conditions on pets...")
+    for item in my_data["pets"]:
         # for some reason, we have a "= 0" condition on our petsmounts
         conds_to_remove = {"conditions": {"and": [{"stat": "", "operator": "=", "value": 1}]}, "customConditions": {}}
         # remove it:
@@ -306,24 +340,55 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
 
     # todo: fix the "or" conditions from doduda, which are currently unsupported
 
-    for data_block in final_data:
-        data_block = sorted(data_block, key=lambda d: d["dofusID"])
+    # copy stuff over from dofuslab data for items that grant titles:
+    if import_titles:
+        logger.info("Fixing titles...")
+        localizations = ["en", "fr", "de", "es", "it", "pt"]
+        title_localizations = {
+            "en": "Title: 0",
+            "fr": "Titre : 0",
+            "de": "Titel: 0",
+            "it": "Titolo: 0",
+            "es": "Título: 0.",
+            "pt": "Título: 0",
+        }
+        for data_block in my_data:
+            for item in my_data[data_block]:
+                # find items with titles:
+                if item["customStats"] != {} and "Title: 0" in item["customStats"]["en"]:
+                    # go find the appropriate title from DofusLab's data
+                    titles = get_dofuslab_titles_for_item(item["dofusID"], data_block, dofuslab_data)
 
-        for item in data_block:
+                    # remove the old "Title: 0" (etc) titles:
+                    for lang in localizations:
+                        item["customStats"][lang].remove(title_localizations[lang])
+
+                    # add the title to our stats:
+                    for lang in localizations:
+                        if titles[lang] != "":
+                            item["customStats"][lang].append(titles[lang])
+
+    # sort items and change the dofusIDs to strings, since that's apparently load-bearing
+    logger.info("Sorting items and converting IDs to strings...")
+    for data_block in my_data:
+        my_data[data_block] = sorted(my_data[data_block], key=lambda d: d["dofusID"])
+
+        for item in my_data[data_block]:
             item["dofusID"] = str(item["dofusID"])
 
-
-    with open("output/items.json", "w+", encoding="utf8") as outfile:
-        outfile.write(json.dumps(dofuslab_data["items"] + final_data["items"], indent=4, ensure_ascii=False))
+    logger.info("Writing files...")
+    # write our files:
+    with open("output/items.json", "w", encoding="utf8") as outfile:
+        outfile.write(json.dumps(my_data["items"], indent=4, ensure_ascii=False))
         outfile.close()
 
     # this doesn't currently populate
     # with open("output/mounts.json", "w+", encoding="utf8") as outfile:
-    #     outfile.write(json.dumps(dofuslab_data["mounts"] + final_data["mounts"], indent=4, ensure_ascii=False))
+    #     outfile.write(json.dumps(final_data["mounts"], indent=4, ensure_ascii=False))
     #     outfile.close()
 
-    with open("output/pets.json", "w+", encoding="utf8") as outfile:
-        outfile.write(json.dumps(dofuslab_data["pets"] + final_data["pets"], indent=4, ensure_ascii=False))
+    with open("output/pets.json", "w", encoding="utf8") as outfile:
+        outfile.write(json.dumps(my_data["pets"], indent=4, ensure_ascii=False))
         outfile.close()
 
     # this doesn't currently populate, so skip writing it
@@ -331,8 +396,8 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
     #     outfile.write(json.dumps(dofuslab_data["rhineetles"] + final_data["rhineetles"], indent=4, ensure_ascii=False))
     #     outfile.close()
 
-    with open("output/weapons.json", "w+", encoding="utf8") as outfile:
-        outfile.write(json.dumps(dofuslab_data["weapons"] + final_data["weapons"], indent=4, ensure_ascii=False))
+    with open("output/weapons.json", "w", encoding="utf8") as outfile:
+        outfile.write(json.dumps(my_data["weapons"], indent=4, ensure_ascii=False))
         outfile.close()
 
 
@@ -356,17 +421,17 @@ def main():
     )
     parser.add_argument("-v", "--verbose", action="store_true", help="Enables verbose debug output", default=False)
     parser.add_argument(
-        "-i",
-        "--ignore_dofuslab",
-        action="store_true",
-        help="Ignores dofuslab data and regenerates entirely from doduda",
-        default=False,
-    )
-    parser.add_argument(
         "-d",
         "--download_imgs",
         action="store_true",
         help="Downloads images from doduda for items",
+        default=False,
+    )
+    parser.add_argument(
+        "-t",
+        "--import_dofuslab_titles",
+        action="store_true",
+        help="Overwrites titles with data from DofusLab",
         default=False,
     )
 
@@ -424,42 +489,52 @@ def main():
     # All DofusLab data to be compiled together
     dofuslab_data = {}
 
-    dofuslab_data["items"] = []
-    dofuslab_data["mounts"] = []
-    dofuslab_data["pets"] = []
-    dofuslab_data["rhineetles"] = []
-    dofuslab_data["weapons"] = []
+    # Opens all Dofuslab data files and aggregates them
+    dofuslab_current_items = open("input/dofuslab/items.json", "r")
+    dofuslab_data["items"] = json.load(dofuslab_current_items)
+    dofuslab_current_items.close()
 
-    if not args.ignore_dofuslab:
-        # Opens all Dofuslab data files and aggregates them
-        dofuslab_current_items = open("input/dofuslab/items.json", "r")
-        current_dl_items = json.load(dofuslab_current_items)
-        dofuslab_current_items.close()
+    dofuslab_current_mounts = open("input/dofuslab/mounts.json", "r")
+    dofuslab_data["mounts"] = json.load(dofuslab_current_mounts)
+    dofuslab_current_mounts.close()
 
-        dofuslab_current_mounts = open("input/dofuslab/mounts.json", "r")
-        current_dl_mounts = json.load(dofuslab_current_mounts)
-        dofuslab_current_mounts.close()
+    dofuslab_current_pets = open("input/dofuslab/pets.json", "r")
+    dofuslab_data["pets"] = json.load(dofuslab_current_pets)
+    dofuslab_current_pets.close()
 
-        dofuslab_current_pets = open("input/dofuslab/pets.json", "r")
-        current_dl_pets = json.load(dofuslab_current_pets)
-        dofuslab_current_pets.close()
+    dofuslab_current_rhineetles = open("input/dofuslab/rhineetles.json", "r")
+    dofuslab_data["rhineetles"] = json.load(dofuslab_current_rhineetles)
+    dofuslab_current_rhineetles.close()
 
-        dofuslab_current_rhineetles = open("input/dofuslab/rhineetles.json", "r")
-        current_dl_rhineetles = json.load(dofuslab_current_rhineetles)
-        dofuslab_current_rhineetles.close()
+    dofuslab_current_weapons = open("input/dofuslab/weapons.json", "r")
+    dofuslab_data["weapons"] = json.load(dofuslab_current_weapons)
+    dofuslab_current_weapons.close()
 
-        dofuslab_current_weapons = open("input/dofuslab/weapons.json", "r")
-        current_dl_weapons = json.load(dofuslab_current_weapons)
-        dofuslab_current_weapons.close()
+    # for some reason, some of the IDs are strs, and some are ints.
+    # convert ids to int:
+    for category in dofuslab_data:
+        for item in dofuslab_data[category]:
+            item["dofusID"] = int(item["dofusID"])
 
-        dofuslab_data["items"] = current_dl_items
-        dofuslab_data["mounts"] = current_dl_mounts
-        dofuslab_data["pets"] = current_dl_pets
-        dofuslab_data["rhineetles"] = current_dl_rhineetles
-        dofuslab_data["weapons"] = current_dl_weapons
+    # sort em for convenience:
+    dofuslab_data["items"] = sorted(dofuslab_data["items"], key=lambda k: k["dofusID"])
+    dofuslab_data["mounts"] = sorted(dofuslab_data["mounts"], key=lambda k: k["dofusID"])
+    dofuslab_data["pets"] = sorted(dofuslab_data["pets"], key=lambda k: k["dofusID"])
+    dofuslab_data["rhineetles"] = sorted(dofuslab_data["rhineetles"], key=lambda k: k["dofusID"])
+    dofuslab_data["weapons"] = sorted(dofuslab_data["weapons"], key=lambda k: k["dofusID"])
+
+    # convert ids back to str:
+    for category in dofuslab_data:
+        for item in dofuslab_data[category]:
+            item["dofusID"] = int(item["dofusID"])
 
     transform_items(
-        dofusdude_data, dofuslab_data, skip=args.skip, replace=args.replace, download_imgs=args.download_imgs
+        dofusdude_data,
+        dofuslab_data,
+        skip=args.skip,
+        replace=args.replace,
+        download_imgs=args.download_imgs,
+        import_titles=args.import_dofuslab_titles,
     )
 
 

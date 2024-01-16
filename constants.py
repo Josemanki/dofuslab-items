@@ -247,7 +247,6 @@ IGNORED_ITEM_IDS = [
     10165, # Trophy Koolich Shield
     10166, # Trophy Sphincter Cell Shield
     10167, # Trophy Bworker Shield
-
 ]
 
 
