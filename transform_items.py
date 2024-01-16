@@ -209,7 +209,10 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
                     }
 
                 rebuilt_item = {
-                    "dofusID": str(item["ankama_id"]),
+                    # this needs to be a str, but for the purposes of sorting, we'll make it an int
+                    # and convert it to a str later.
+                    # "dofusID": str(item["ankama_id"]),
+                    "dofusID": item["ankama_id"],
                     "name": {
                         "en": en_item["name"],
                         "fr": fr_item["name"],
@@ -266,7 +269,10 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
                     }
 
                 rebuilt_item = {
-                    "dofusID": str(item["ankama_id"]),
+                    # this needs to be a str, but for the purposes of sorting, we'll make it an int
+                    # and convert it to a str later.
+                    # "dofusID": str(item["ankama_id"]),
+                    "dofusID": item["ankama_id"],
                     "name": {
                         "en": en_item["name"],
                         "fr": fr_item["name"],
@@ -297,6 +303,15 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
         if item["conditions"] == conds_to_remove:
             logger.info(f"Removing extraneous conditions on {item["name"]["en"]}")
             item["conditions"] = {"conditions": {}, "customConditions": {}}
+
+    # todo: fix the "or" conditions from doduda, which are currently unsupported
+
+    for data_block in final_data:
+        data_block = sorted(data_block, key=lambda d: d["dofusID"])
+
+        for item in data_block:
+            item["dofusID"] = str(item["dofusID"])
+
 
     with open("output/items.json", "w+", encoding="utf8") as outfile:
         outfile.write(json.dumps(dofuslab_data["items"] + final_data["items"], indent=4, ensure_ascii=False))

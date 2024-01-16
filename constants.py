@@ -231,12 +231,23 @@ IGNORED_ITEM_IDS = [
     29223, # Hard-Charging Yakitoro
     29225, # Skewer-Happy Yakitoro
     21186, # Vulbis Dofus (quest version)
+    27803, # Pine Done
     29134, # Sylvan Dofus (quest version)
     29135, # Verdant Dofus (quest item, basically Pine Done)
-    # 29135, # Verdant Dofus (quest item)
     6894, # Ultra-powerful Combat Bow Meow (GM)
     6895, # Small Combat Bow Meow (GM)
     7913, # Animagi (GM)
+    10158, # Trophy Dark Vlad Shield
+    10159, # Trophy Moon Shield
+    10160, # Trophy Soft Oak Shield
+    10161, # Trophy Dragon Pig Shield
+    10162, # Trophy Minotoror Shield
+    10163, # Trophy Kimbo Shield
+    10164, # Trophy Wa Wabbit Shield
+    10165, # Trophy Koolich Shield
+    10166, # Trophy Sphincter Cell Shield
+    10167, # Trophy Bworker Shield
+
 ]
 
 
