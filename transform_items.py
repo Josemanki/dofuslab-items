@@ -91,7 +91,12 @@ def format_image_and_download(image_urls):
     return img_id
 
 
-def transform_conditions(conditions):
+def transform_conditions(conditions: dict) -> dict:
+    """
+    Survival changed how he formats conditions and now there's a "condition_tree"
+    that this doesn't handle. As such, this will probably go away in favor of
+    handling the tree.
+    """
     retConditions = {"conditions": {}}
     condition_list = {"and": []}
     for condition in conditions:
@@ -107,7 +112,82 @@ def transform_conditions(conditions):
     return retConditions
 
 
-def transform_stats(stats):
+def transform_condition(condition: dict) -> dict:
+    """
+    Transforms a single condition to the DofusLab style from Doduda
+    """
+    dofuslab_condition = {
+        "stat": condition["element"]["name"].upper().replace(" ", "_"),
+        "operator": condition["operator"],
+        "value": condition["int_value"],
+    }
+    return dofuslab_condition
+
+
+def transform_cond_subtree(tree: dict) -> dict:
+    """
+    If this 'is_operand' then it has a 'condition' with stats
+    Otherwise, it has 'children' and a 'relation' and we should recurse.
+    """
+    ret_dict = {}
+    conditions = []
+    relation = tree["relation"]
+    for child in tree["children"]:
+        if child["is_operand"]:
+            conditions.append(transform_condition(child["condition"]))
+        else:
+            if relation == child['relation']:
+                logger.debug("Hey! We can string these together!!")
+                conditions.append(transform_cond_subtree(child))
+            else:
+                conditions.append(transform_cond_subtree(child))
+
+    ret_dict[relation] = conditions
+
+    # note: we need to flatten the tree if there's multiple nested
+    # relations of the same type, as doduda just does 2 per "and"/"or"
+    # but dofuslab can string many children under the same comparison
+    # together
+
+    # flatten the tree before returning it to the stack:
+    for child in ret_dict[relation]:
+        # check if the child has the same operator as above:
+        if relation in child:
+            # flatten
+            print("aaaa")
+            for stat in child[relation]:
+                ret_dict[relation].append(stat)
+            ret_dict[relation].remove(child)
+
+    return ret_dict
+
+
+def transform_condition_tree(condition_tree: dict) -> dict:
+    """
+    Tempted to handle this tree recursively because I'm too tired to
+     do it iteratively, and the tree should only be like max 2 depth
+    """
+    dofuslab_conditions = {}
+
+    dofuslab_conditions["conditions"] = {}
+    dofuslab_conditions["customConditions"] = {}  # todo: fill these out
+
+    # handle the base case:
+    if condition_tree["is_operand"]:
+        cond = transform_condition(condition_tree["condition"])
+        dofuslab_conditions["conditions"] = cond
+    else:
+        # there's a `relation` here that corresponds to a key in the
+        # dofuslab data structure, and a `children` that has the conditions that
+        # correspond to the tree off of that relation
+        subtree = transform_cond_subtree(condition_tree)
+
+        dofuslab_conditions["conditions"] = subtree
+
+    return dofuslab_conditions
+
+
+def transform_stats(stats: dict) -> dict:
     normal_stats = []
     weapon_stats = []
     custom_stats = {"en": [], "fr": [], "de": [], "es": [], "it": [], "pt": []}
@@ -180,7 +260,6 @@ def get_dofuslab_titles_for_item(item_id, data_block, dofuslab_data):
 
             # find the title within the custom stats, using our title_name to search
             for lang in langs:
-
                 for entry in item["customStats"][lang]:
                     if title_name[lang] in entry:
                         ret_titles[lang] = entry
@@ -191,9 +270,7 @@ def get_dofuslab_titles_for_item(item_id, data_block, dofuslab_data):
     return ret_titles
 
 
-def transform_items(
-    dofusdude_data, dofuslab_data, skip=True, replace=False, download_imgs=False, import_titles=False
-):
+def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, download_imgs=False, import_titles=False):
     # set up dictionary of lists of items
     my_data = {}
     for item_type in {"items", "mounts", "pets", "rhineetles", "weapons"}:
@@ -203,8 +280,10 @@ def transform_items(
     if not path.exists("output"):
         makedirs("output")
 
-    # for item in dofusdude_data["en"]["items"]:
     for item in dofusdude_data["en"]["items"]:
+        if item["name"] == "Flinty Daggers":
+            print("break!")
+
         if skip and item_exists(item["name"], dofuslab_data):
             logger.info(f"Skipping: {item["name"]}")
             continue
@@ -244,7 +323,6 @@ def transform_items(
                 rebuilt_item = {
                     # this needs to be a str, but for the purposes of sorting, we'll make it an int
                     # and convert it to a str later.
-                    # "dofusID": str(item["ankama_id"]),
                     "dofusID": item["ankama_id"],
                     "name": {
                         "en": en_item["name"],
@@ -268,8 +346,11 @@ def transform_items(
                         "weapon_effects": item_effects["weaponStats"],
                     },
                     "customStats": custom_stats,
-                    "conditions": transform_conditions(item["conditions"])
-                    if "conditions" in item
+                    # "conditions": transform_conditions(item["conditions"])
+                    # if "conditions" in item
+                    # else {"conditions": {}, "customConditions": {}},
+                    "conditions": transform_condition_tree(item["condition_tree"])
+                    if "condition_tree" in item
                     else {"conditions": {}, "customConditions": {}},
                     "imageUrl": format_image(item["image_urls"]),
                 }
@@ -304,7 +385,6 @@ def transform_items(
                 rebuilt_item = {
                     # this needs to be a str, but for the purposes of sorting, we'll make it an int
                     # and convert it to a str later.
-                    # "dofusID": str(item["ankama_id"]),
                     "dofusID": item["ankama_id"],
                     "name": {
                         "en": en_item["name"],
@@ -319,8 +399,11 @@ def transform_items(
                     "level": item["level"],
                     "stats": item_effects["stats"],
                     "customStats": custom_stats,
-                    "conditions": transform_conditions(item["conditions"])
-                    if "conditions" in item
+                    # "conditions": transform_conditions(item["conditions"])
+                    # if "conditions" in item
+                    # else {"conditions": {}, "customConditions": {}},
+                    "conditions": transform_condition_tree(item["condition_tree"])
+                    if "condition_tree" in item
                     else {"conditions": {}, "customConditions": {}},
                     "imageUrl": format_image(item["image_urls"]),
                 }
@@ -337,8 +420,6 @@ def transform_items(
         if item["conditions"] == conds_to_remove:
             logger.info(f"Removing extraneous conditions on {item["name"]["en"]}")
             item["conditions"] = {"conditions": {}, "customConditions": {}}
-
-    # todo: fix the "or" conditions from doduda, which are currently unsupported
 
     # copy stuff over from dofuslab data for items that grant titles:
     if import_titles:
