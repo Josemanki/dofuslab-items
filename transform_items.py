@@ -136,7 +136,7 @@ def transform_cond_subtree(tree: dict) -> dict:
         if child["is_operand"]:
             conditions.append(transform_condition(child["condition"]))
         else:
-            if relation == child['relation']:
+            if relation == child["relation"]:
                 logger.debug("Hey! We can string these together!!")
                 conditions.append(transform_cond_subtree(child))
             else:
@@ -270,7 +270,25 @@ def get_dofuslab_titles_for_item(item_id, data_block, dofuslab_data):
     return ret_titles
 
 
-def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, download_imgs=False, import_titles=False):
+def get_dofuslab_customConditions_for_item(item_id, data_block, dofuslab_data):
+    for item in dofuslab_data[data_block]:
+        if int(item["dofusID"]) == item_id:
+            if item["conditions"]["customConditions"] == {}:
+                return {}
+
+            # Copy over the customConditions wholesale:
+            return item["conditions"]["customConditions"]
+
+
+def transform_items(
+    dofusdude_data,
+    dofuslab_data,
+    skip=True,
+    replace=False,
+    download_imgs=False,
+    import_titles=False,
+    import_custom_conditions=False,
+):
     # set up dictionary of lists of items
     my_data = {}
     for item_type in {"items", "mounts", "pets", "rhineetles", "weapons"}:
@@ -422,6 +440,7 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
             item["conditions"] = {"conditions": {}, "customConditions": {}}
 
     # copy stuff over from dofuslab data for items that grant titles:
+    # note: this has since been fixed in the API
     if import_titles:
         logger.info("Fixing titles...")
         localizations = ["en", "fr", "de", "es", "it", "pt"]
@@ -448,6 +467,15 @@ def transform_items(dofusdude_data, dofuslab_data, skip=True, replace=False, dow
                     for lang in localizations:
                         if titles[lang] != "":
                             item["customStats"][lang].append(titles[lang])
+
+    # copy stuff over from dofuslab data for items that have custom (typically quest) conditions:
+    if import_custom_conditions:
+        logger.info("Fixing custom conditions...")
+        for data_block in my_data:
+            for item in my_data[data_block]:
+                item["conditions"]["customConditions"] = get_dofuslab_customConditions_for_item(
+                    item["dofusID"], data_block, dofuslab_data
+                )
 
     # sort items and change the dofusIDs to strings, since that's apparently load-bearing
     logger.info("Sorting items and converting IDs to strings...")
@@ -513,6 +541,13 @@ def main():
         "--import_dofuslab_titles",
         action="store_true",
         help="Overwrites titles with data from DofusLab",
+        default=False,
+    )
+    parser.add_argument(
+        "-c",
+        "--import_dofuslab_custom_conditions",
+        action="store_true",
+        help="Overwrites custom conditions with data from DofusLab",
         default=False,
     )
 
@@ -616,6 +651,7 @@ def main():
         replace=args.replace,
         download_imgs=args.download_imgs,
         import_titles=args.import_dofuslab_titles,
+        import_custom_conditions=args.import_dofuslab_custom_conditions,
     )
 
 
