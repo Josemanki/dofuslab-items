@@ -170,19 +170,16 @@ def transform_condition_tree(condition_tree: dict) -> dict:
     dofuslab_conditions = {}
 
     dofuslab_conditions["conditions"] = {}
-    dofuslab_conditions["customConditions"] = {}  # todo: fill these out
+    dofuslab_conditions["customConditions"] = {}  # todo: fill these out when the API supports it
 
     # handle the base case:
     if condition_tree["is_operand"]:
-        cond = transform_condition(condition_tree["condition"])
-        dofuslab_conditions["conditions"] = cond
+        dofuslab_conditions["conditions"] = transform_condition(condition_tree["condition"])
     else:
         # there's a `relation` here that corresponds to a key in the
         # dofuslab data structure, and a `children` that has the conditions that
         # correspond to the tree off of that relation
-        subtree = transform_cond_subtree(condition_tree)
-
-        dofuslab_conditions["conditions"] = subtree
+        dofuslab_conditions["conditions"] = transform_cond_subtree(condition_tree)
 
     return dofuslab_conditions
 
@@ -271,6 +268,10 @@ def get_dofuslab_titles_for_item(item_id, data_block, dofuslab_data):
 
 
 def get_dofuslab_customConditions_for_item(item_id, data_block, dofuslab_data):
+    """
+    This is for importing customConditions from old DofusLab data since Survival's API
+    currently doesn't support them.
+    """
     for item in dofuslab_data[data_block]:
         if int(item["dofusID"]) == item_id:
             if item["conditions"]["customConditions"] == {}:
@@ -278,6 +279,9 @@ def get_dofuslab_customConditions_for_item(item_id, data_block, dofuslab_data):
 
             # Copy over the customConditions wholesale:
             return item["conditions"]["customConditions"]
+
+    # if it isn't found, return {}
+    return {}
 
 
 def transform_items(
