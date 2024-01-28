@@ -65,7 +65,7 @@ WEAPON_STAT_MAP = {
 }
 
 CUSTOM_STAT_MAP = [
-    "Exchangeable:",
+    # "Exchangeable:",
     "Compatible with:",
     "% Critical Hit bonus on the spell",
     "Increases the spell's maximum range by",
@@ -86,7 +86,7 @@ CUSTOM_STAT_MAP = [
     "Learn the spell level",
     "XP",
     "What's in there?",
-    "emote",
+    # "emote",
     "Be level or higher",
     "Positions the compass",
     "No future smithmagic",
@@ -174,7 +174,7 @@ CUSTOM_STAT_MAP = [
 
 PET_ITEM_TYPES = ["Pet", "Petsmount"]
 
-DOFUSLAB_CATEGORIES = ['items', 'mounts', 'pets', 'rhineetles', 'sets', 'weapons']
+DOFUSLAB_CATEGORIES = ["items", "mounts", "pets", "rhineetles", "sets", "weapons"]
 
 WEAPON_TYPES = [
     "Axe",
@@ -192,6 +192,11 @@ WEAPON_TYPES = [
     "Wand",
 ]
 
+MOUNT_TYPES = [
+    "Dragoturkey Certificate",
+
+]
+
 IGNORED_CATEGORIES = [
     "Sidekick",
     "Tool",
@@ -203,6 +208,48 @@ IGNORED_CATEGORIES = [
     "Expedition Idol",
 ]
 
-SETS_BASE_URL = 'https://api.dofusdu.de/dofus2/{}/sets/all'
-ITEMS_BASE_URL = 'https://api.dofusdu.de/dofus2/{}/items/equipment/all'
-DOFUSLAB_GH_BASE_URL = 'https://raw.githubusercontent.com/dofuslab/dofuslab/master/server/app/database/data/{}.json'
+IGNORED_ITEM_TYPES = [
+    "Perceptor Daggers",
+    "Perceptor Armour",
+    "Perceptor Chests",
+    "Perceptor Bags",
+    "Perceptor Shoes",
+    "Perceptor Tunic",
+    "Perceptor Banner",
+    # Temporis items:
+    "Badge"
+]
+
+IGNORED_ITEM_IDS = [
+    29115, # Naive Yakitoro
+    29120, # Innocent Yakitoro
+    29122, # Carefree Yakitoro
+    29194, # Docile Yakitoro
+    29216, # Ruminant Yakitoro
+    29219, # Horned Yakitoro
+    29221, # Slugger Yakitoro
+    29223, # Hard-Charging Yakitoro
+    29225, # Skewer-Happy Yakitoro
+    21186, # Vulbis Dofus (quest version)
+    27803, # Pine Done
+    29134, # Sylvan Dofus (quest version)
+    29135, # Verdant Dofus (quest item, basically Pine Done)
+    6894, # Ultra-powerful Combat Bow Meow (GM)
+    6895, # Small Combat Bow Meow (GM)
+    7913, # Animagi (GM)
+    10158, # Trophy Dark Vlad Shield
+    10159, # Trophy Moon Shield
+    10160, # Trophy Soft Oak Shield
+    10161, # Trophy Dragon Pig Shield
+    10162, # Trophy Minotoror Shield
+    10163, # Trophy Kimbo Shield
+    10164, # Trophy Wa Wabbit Shield
+    10165, # Trophy Koolich Shield
+    10166, # Trophy Sphincter Cell Shield
+    10167, # Trophy Bworker Shield
+]
+
+
+SETS_BASE_URL = "https://api.dofusdu.de/dofus2/{}/sets/all"
+ITEMS_BASE_URL = "https://api.dofusdu.de/dofus2/{}/items/equipment/all"
+DOFUSLAB_GH_BASE_URL = "https://raw.githubusercontent.com/dofuslab/dofuslab/master/server/app/database/data/{}.json"
