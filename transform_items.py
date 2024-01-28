@@ -136,11 +136,7 @@ def transform_cond_subtree(tree: dict) -> dict:
         if child["is_operand"]:
             conditions.append(transform_condition(child["condition"]))
         else:
-            if relation == child["relation"]:
-                logger.debug("Hey! We can string these together!!")
-                conditions.append(transform_cond_subtree(child))
-            else:
-                conditions.append(transform_cond_subtree(child))
+            conditions.append(transform_cond_subtree(child))
 
     ret_dict[relation] = conditions
 
@@ -154,7 +150,6 @@ def transform_cond_subtree(tree: dict) -> dict:
         # check if the child has the same operator as above:
         if relation in child:
             # flatten
-            print("aaaa")
             for stat in child[relation]:
                 ret_dict[relation].append(stat)
             ret_dict[relation].remove(child)
