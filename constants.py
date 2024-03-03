@@ -203,7 +203,6 @@ IGNORED_CATEGORIES = [
     "Pickaxe",
     "Soul stone",
     "Capturing net",
-    "Prysmaradite",
     "Magic weapon",
     "Expedition Idol",
 ]
@@ -221,6 +220,7 @@ IGNORED_ITEM_TYPES = [
 ]
 
 IGNORED_ITEM_IDS = [
+    # Osatopia 2 pets:
     29115, # Naive Yakitoro
     29120, # Innocent Yakitoro
     29122, # Carefree Yakitoro
@@ -230,13 +230,37 @@ IGNORED_ITEM_IDS = [
     29221, # Slugger Yakitoro
     29223, # Hard-Charging Yakitoro
     29225, # Skewer-Happy Yakitoro
+
+    # Temporis IDR which:
+    27070, # Reincarnated Garudania
+    27072, # Incubated Garudania
+    27075, # Hatched Garudania
+    27077, # Crackling Garudania
+
+    # Eca city, the actual worst Temporis:
+    25024, # Louz
+    25032, # Catmeleon Louz
+
+    # Quest Dofuses:
     21186, # Vulbis Dofus (quest version)
     27803, # Pine Done
     29134, # Sylvan Dofus (quest version)
     29135, # Verdant Dofus (quest item, basically Pine Done)
+
+    # GM stuff:
+    2154, # De Sendar's Ring, requires Player = Silaisie
+    2155, # Jiva Necklace, requires Player = Silaisie
+    2156, # Sword of Justice, requires Player = Silaisie
+    6713, # Lordsoth Daggers, requires Player = Lordsoth
+    8575, # First Blood Staff, requires Player = XxRamboPLxX
     6894, # Ultra-powerful Combat Bow Meow (GM)
     6895, # Small Combat Bow Meow (GM)
     7913, # Animagi (GM)
+    9031, # Gore Master's Ring (Gms Only)
+    9919, # Owl Ring, mentor ring
+    
+
+    # Title Shields:
     10158, # Trophy Dark Vlad Shield
     10159, # Trophy Moon Shield
     10160, # Trophy Soft Oak Shield
@@ -247,6 +271,52 @@ IGNORED_ITEM_IDS = [
     10165, # Trophy Koolich Shield
     10166, # Trophy Sphincter Cell Shield
     10167, # Trophy Bworker Shield
+
+    # Random unabtainable/quest stuff:
+    6800, # Basic Cloak
+    677, # Pirate Cloak, unobtainable
+    13063, # Split Splinter Sprinter, unequippable
+    8854, # Crack Sparrow's Own Withered Hat, requires Server = Shika
+    1628, # Fire Artefact, unobtainable
+    1629, # Earth Artefact, unobtainable
+    1630, # Air Artefact, unobtainable
+    1631, # Water Artefact, unobtainable
+    1632, # Light Artefact, unobtainable
+    1633, # Life Artefact, unobtainable
+    19641, # Nackle Tabard
+    8627, # Sarr Ys's Flute, event reward, statless
+    9627, # Apprentice Pilgrim Staff, statless, idk where from
+    19639, # Syllabu Shield
+    7097, # Training Shield
+    15157, # Questhead, event hat, no stats
+    2341, # Mech Riorraw's Bow, bonta quest bow
+    2361, # Mulic Bere's Bow, brak quest bow
+    8338, # Kwismas Sword, event/quest sword with no stats
+    6773, # Tude Amulet, unobtainable from old Astrub quests
+    21711, # Weighted Wooden Wings, quest item
+    21712, # Weighted Helmet, quest item
+    23094, # Panduckler, quest item
+    27431, # Young Celestial Gobbly, seems unobtainable
+    6839, # Yingnitiate Sword, Ecaflip + Male only
+    6840, # Yanguru Sword, Ecaflip + Female only
+    9396, # Zawooin's Seal, unobtainable item with no stats
+    17627, # Experimental Foam Shield
+    17628, # Experimental Wool Shield
+    17629, # Experimental Trud Shield
+    17684, # Improbability Magnifier
+    17961, # Isolation Helmet
+    23501, # Pandasiman Training Shield
+    23563, # Voluntary Sacrifice
+    23805, # Master Tor Toise's Training Shell
+    29110, # Menologium
+    29133, # Blessed Menologium
+    26366, # Ochre Ring
+    8701, # Nicked Sword, Ankama lottery
+    10223, # Dontase Mebro shovel
+    17460, # Bony Wand (quest item)
+    17809, # Ereziah Hammer (quest item)
+    19637, # Weapon Curse (quest item)
+    25235, # Danaba's Blade (quest item)
 ]
 
 
