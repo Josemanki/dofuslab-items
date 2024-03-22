@@ -258,7 +258,6 @@ IGNORED_ITEM_IDS = [
     7913, # Animagi (GM)
     9031, # Gore Master's Ring (Gms Only)
     9919, # Owl Ring, mentor ring
-    
 
     # Title Shields:
     10158, # Trophy Dark Vlad Shield
@@ -323,3 +322,5 @@ IGNORED_ITEM_IDS = [
 SETS_BASE_URL = "https://api.dofusdu.de/dofus2/{}/sets/all"
 ITEMS_BASE_URL = "https://api.dofusdu.de/dofus2/{}/items/equipment/all"
 DOFUSLAB_GH_BASE_URL = "https://raw.githubusercontent.com/dofuslab/dofuslab/master/server/app/database/data/{}.json"
+BETA_SETS_BASE_URL = "https://api.dofusdu.de/dofus2beta/{}/sets/all"
+BETA_ITEMS_BASE_URL = "https://api.dofusdu.de/dofus2beta/{}/items/equipment/all"

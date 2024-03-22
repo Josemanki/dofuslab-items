@@ -12,6 +12,8 @@ from constants import (
     SETS_BASE_URL,
     ITEMS_BASE_URL,
     DOFUSLAB_GH_BASE_URL,
+    BETA_SETS_BASE_URL,
+    BETA_ITEMS_BASE_URL
 )
 
 logger = logging.getLogger(__name__)
@@ -23,10 +25,11 @@ coloredlogs.install(level="DEBUG", logger=logger, fmt="%(asctime)s %(levelname)s
 languages = ["en", "fr", "de", "es", "pt", "it"]
 
 
-def get_set_files():
+def get_set_files(beta: bool):
     for language in languages:
+        fetch_url = SETS_BASE_URL if not beta else BETA_SETS_BASE_URL
         logger.info(f"Fetching set data for {language}")
-        content = requests.get(SETS_BASE_URL.format(language))
+        content = requests.get(fetch_url.format(language))
         parsed = content.json()
 
         dir_path = path.dirname(path.realpath(__file__))
@@ -41,10 +44,11 @@ def get_set_files():
             json.dump(parsed, file, indent=4, ensure_ascii=False)
 
 
-def get_item_files():
+def get_item_files(beta: bool):
     for language in languages:
+        fetch_url = ITEMS_BASE_URL if not beta else BETA_ITEMS_BASE_URL
         logger.info(f"Fetching item data for {language}")
-        content = requests.get(ITEMS_BASE_URL.format(language))
+        content = requests.get(fetch_url.format(language))
         parsed = content.json()
 
         dir_path = path.dirname(path.realpath(__file__))
@@ -82,17 +86,18 @@ def main() -> None:
         description="Fetches data from dodua to populate json data for dofuslab",
     )
     parser.add_argument("datafile", type=str, help="the data to fetch")
+    parser.add_argument("-b", "--beta", action="store_true", help="Enables beta data fetch", default=False)
 
     args = parser.parse_args()
 
     try:
         if args.datafile == "sets":
             logger.info("Fetching dodua set data...")
-            get_set_files()
+            get_set_files(beta=args.beta)
             logger.info("Fetched dodua set data.")
         elif args.datafile == "items":
             logger.info("Fetching dodua item data...")
-            get_item_files()
+            get_item_files(beta=args.beta)
             logger.info("Fetched dodua item data.")
         elif args.datafile == "dofuslab":
             logger.info("Fetching dofuslab data...")
