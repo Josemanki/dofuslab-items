@@ -487,12 +487,12 @@ def transform_items(
     logger.info("Writing files...")
     # write our files:
     with open("output/items.json", "w", encoding="utf8") as outfile:
-        outfile.write(json.dumps(my_data["items"], indent=4, ensure_ascii=False))
+        outfile.write(json.dumps(my_data["items"], indent=2, ensure_ascii=False))
         outfile.close()
 
     # this doesn't currently populate
     # with open("output/mounts.json", "w+", encoding="utf8") as outfile:
-    #     outfile.write(json.dumps(final_data["mounts"], indent=4, ensure_ascii=False))
+    #     outfile.write(json.dumps(final_data["mounts"], indent=2, ensure_ascii=False))
     #     outfile.close()
 
     with open("output/pets.json", "w", encoding="utf8") as outfile:
@@ -501,11 +501,11 @@ def transform_items(
 
     # this doesn't currently populate, so skip writing it
     # with open("output/rhineetles.json", "w+", encoding="utf8") as outfile:
-    #     outfile.write(json.dumps(dofuslab_data["rhineetles"] + final_data["rhineetles"], indent=4, ensure_ascii=False))
+    #     outfile.write(json.dumps(dofuslab_data["rhineetles"] + final_data["rhineetles"], indent=2, ensure_ascii=False))
     #     outfile.close()
 
     with open("output/weapons.json", "w", encoding="utf8") as outfile:
-        outfile.write(json.dumps(my_data["weapons"], indent=4, ensure_ascii=False))
+        outfile.write(json.dumps(my_data["weapons"], indent=2, ensure_ascii=False))
         outfile.close()
 
 
