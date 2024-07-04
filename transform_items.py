@@ -224,12 +224,29 @@ def find_localized_item(item_id, language_data):
         logger.warning(f"Localization not found for id {item_id}")
 
 
-def localize_custom_stats_from_id(stat_ids, item_stats):
+def localize_custom_stats_from_item(en_item, item):
     custom_stats = []
 
-    for stat_id in stat_ids:
-        found = next(item for item in item_stats if item["type"]["id"] == stat_id)
-        custom_stats.append(found["formatted"])
+    for effect in zip(en_item["effects"], item["effects"]):
+        if effect[0]["type"]["name"] not in NORMAL_STAT_MAP:
+            # if it's not in the normal stat map, it's *probably* something
+            #  that we want to include, but there's a couple examples of stuff
+            #  that we don't want to include:
+            # - Exchangable: 0
+            # - Emote: 0
+            # note: they seem to be somewhat inconsistently typed, might be something
+            #  Survival has control over.
+            # so, let's filter these out:
+            if effect[0]["type"]["name"] in ["Exchangeable:", "emote"]:
+                continue
+
+            # apparently we also need to filter out damage lines on weapons:
+            if " damage)" in effect[0]["type"]["name"]:
+                continue
+            if " steal)" in effect[0]["type"]["name"]:
+                continue
+
+            custom_stats.append(effect[1]["formatted"])
 
     return custom_stats
 
@@ -298,7 +315,7 @@ def transform_items(
         makedirs("output")
 
     for item in dofusdude_data["en"]["items"]:
-        if item["name"] == "Flinty Daggers":
+        if item["name"] == "Black-Spotted Dofus":
             print("break!")
 
         if skip and item_exists(item["name"], dofuslab_data):
@@ -330,11 +347,11 @@ def transform_items(
                 if "en" in item_effects["customStats"]:
                     custom_stats = {
                         "en": item_effects["customStats"]["en"],
-                        "fr": localize_custom_stats_from_id(item_effects["customStats"]["fr"], fr_item["effects"]),
-                        "de": localize_custom_stats_from_id(item_effects["customStats"]["de"], de_item["effects"]),
-                        "it": localize_custom_stats_from_id(item_effects["customStats"]["it"], it_item["effects"]),
-                        "es": localize_custom_stats_from_id(item_effects["customStats"]["es"], es_item["effects"]),
-                        "pt": localize_custom_stats_from_id(item_effects["customStats"]["pt"], pt_item["effects"]),
+                        "fr": localize_custom_stats_from_item(en_item, fr_item),
+                        "de": localize_custom_stats_from_item(en_item, de_item),
+                        "it": localize_custom_stats_from_item(en_item, it_item),
+                        "es": localize_custom_stats_from_item(en_item, es_item),
+                        "pt": localize_custom_stats_from_item(en_item, pt_item),
                     }
 
                 rebuilt_item = {
@@ -392,11 +409,11 @@ def transform_items(
                 if "en" in item_effects["customStats"]:
                     custom_stats = {
                         "en": item_effects["customStats"]["en"],
-                        "fr": localize_custom_stats_from_id(item_effects["customStats"]["fr"], fr_item["effects"]),
-                        "de": localize_custom_stats_from_id(item_effects["customStats"]["de"], de_item["effects"]),
-                        "it": localize_custom_stats_from_id(item_effects["customStats"]["it"], it_item["effects"]),
-                        "es": localize_custom_stats_from_id(item_effects["customStats"]["es"], es_item["effects"]),
-                        "pt": localize_custom_stats_from_id(item_effects["customStats"]["pt"], pt_item["effects"]),
+                        "fr": localize_custom_stats_from_item(en_item, fr_item),
+                        "de": localize_custom_stats_from_item(en_item, de_item),
+                        "it": localize_custom_stats_from_item(en_item, it_item),
+                        "es": localize_custom_stats_from_item(en_item, es_item),
+                        "pt": localize_custom_stats_from_item(en_item, pt_item),
                     }
 
                 rebuilt_item = {

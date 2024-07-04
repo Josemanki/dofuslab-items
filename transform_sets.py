@@ -77,7 +77,7 @@ def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replac
     for dset in dofusdude_data["en"]["sets"]:
         # skip set if the name contains " Ceremonial Set" - the leading space is important
         if " Ceremonial Set" in dset["name"]:
-            logger.info(f"Skipping: {dset["name"]}")
+            logger.info(f"Skipping ceremonial set: {dset["name"]}")
             continue
 
         logger.info(f"Transforming: {dset["name"]}")
