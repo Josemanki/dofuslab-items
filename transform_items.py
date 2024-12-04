@@ -188,7 +188,8 @@ def transform_condition_tree(condition_tree: dict) -> dict:
 def transform_stats(stats: dict) -> dict:
     normal_stats = []
     weapon_stats = []
-    custom_stats = {"en": [], "fr": [], "de": [], "es": [], "it": [], "pt": []}
+    # custom_stats = {"en": [], "fr": [], "de": [], "es": [], "it": [], "pt": []}
+    custom_stats = {"en": [], "fr": [], "de": [], "es": [], "pt": []}
 
     for stat in stats:
         ## API ID for - AP is 179 and - MP is 192 - these are weapon stats only
@@ -240,8 +241,8 @@ def transform_stats(stats: dict) -> dict:
             custom_stats["fr"].append(stat["type"]["id"])
             custom_stats["de"].append(stat["type"]["id"])
             custom_stats["es"].append(stat["type"]["id"])
-            custom_stats["it"].append(stat["type"]["id"])
             custom_stats["pt"].append(stat["type"]["id"])
+            # custom_stats["it"].append(stat["type"]["id"])
 
     return {
         "stats": normal_stats,
@@ -286,16 +287,18 @@ def localize_custom_stats_from_item(en_item, item):
 
 
 def get_dofuslab_titles_for_item(item_id, data_block, dofuslab_data):
-    ret_titles = {"en": "", "fr": "", "de": "", "es": "", "it": "", "pt": ""}
+    # ret_titles = {"en": "", "fr": "", "de": "", "es": "", "it": "", "pt": ""}
+    ret_titles = {"en": "", "fr": "", "de": "", "es": "", "pt": ""}
 
-    langs = ["en", "fr", "de", "es", "it", "pt"]
+    # langs = ["en", "fr", "de", "es", "it", "pt"]
+    langs = ["en", "fr", "de", "es", "pt"]
     title_name = {
         "en": "Title",
         "fr": "Titre",
         "de": "Titel",
         "es": "Título",
-        "it": "Titolo",
         "pt": "Título",
+        # "it": "Titolo",
     }
 
     for item in dofuslab_data[data_block]:
@@ -390,21 +393,21 @@ def transform_items(
                 de_item = find_localized_item(
                     item["ankama_id"], dofusdude_data["de"]["items"]
                 )
-                it_item = find_localized_item(
-                    item["ankama_id"], dofusdude_data["it"]["items"]
-                )
                 pt_item = find_localized_item(
                     item["ankama_id"], dofusdude_data["pt"]["items"]
                 )
+                # it_item = find_localized_item(
+                #     item["ankama_id"], dofusdude_data["it"]["items"]
+                # )
 
                 if "en" in item_effects["customStats"]:
                     custom_stats = {
                         "en": item_effects["customStats"]["en"],
                         "fr": localize_custom_stats_from_item(en_item, fr_item),
                         "de": localize_custom_stats_from_item(en_item, de_item),
-                        "it": localize_custom_stats_from_item(en_item, it_item),
                         "es": localize_custom_stats_from_item(en_item, es_item),
                         "pt": localize_custom_stats_from_item(en_item, pt_item),
+                        # "it": localize_custom_stats_from_item(en_item, it_item),
                     }
 
                 rebuilt_item = {
@@ -415,9 +418,9 @@ def transform_items(
                         "en": en_item["name"],
                         "fr": fr_item["name"],
                         "de": de_item["name"],
-                        "it": it_item["name"],
                         "es": es_item["name"],
                         "pt": pt_item["name"],
+                        # "it": it_item["name"],
                     },
                     "itemType": item["type"]["name"],
                     "setID": (
@@ -472,21 +475,21 @@ def transform_items(
                 de_item = find_localized_item(
                     item["ankama_id"], dofusdude_data["de"]["items"]
                 )
-                it_item = find_localized_item(
-                    item["ankama_id"], dofusdude_data["it"]["items"]
-                )
                 pt_item = find_localized_item(
                     item["ankama_id"], dofusdude_data["pt"]["items"]
                 )
+                # it_item = find_localized_item(
+                #     item["ankama_id"], dofusdude_data["it"]["items"]
+                # )
 
                 if "en" in item_effects["customStats"]:
                     custom_stats = {
                         "en": item_effects["customStats"]["en"],
                         "fr": localize_custom_stats_from_item(en_item, fr_item),
                         "de": localize_custom_stats_from_item(en_item, de_item),
-                        "it": localize_custom_stats_from_item(en_item, it_item),
                         "es": localize_custom_stats_from_item(en_item, es_item),
                         "pt": localize_custom_stats_from_item(en_item, pt_item),
+                        # "it": localize_custom_stats_from_item(en_item, it_item),
                     }
 
                 rebuilt_item = {
@@ -497,9 +500,9 @@ def transform_items(
                         "en": en_item["name"],
                         "fr": fr_item["name"],
                         "de": de_item["name"],
-                        "it": it_item["name"],
                         "es": es_item["name"],
                         "pt": pt_item["name"],
+                        # "it": it_item["name"],
                     },
                     "itemType": item["type"]["name"],
                     "setID": (
@@ -722,8 +725,8 @@ def main():
     dofusdude_data["fr"] = fr_dofusdude_data
     dofusdude_data["es"] = es_dofusdude_data
     dofusdude_data["de"] = de_dofusdude_data
-    dofusdude_data["it"] = it_dofusdude_data
     dofusdude_data["pt"] = pt_dofusdude_data
+    # dofusdude_data["it"] = it_dofusdude_data
 
     # All DofusLab data to be compiled together
     dofuslab_data = {}

@@ -316,8 +316,16 @@ IGNORED_ITEM_IDS = [
 ]
 
 
-SETS_BASE_URL = "https://api.dofusdu.de/dofus2/{}/sets/all"
-ITEMS_BASE_URL = "https://api.dofusdu.de/dofus2/{}/items/equipment/all"
+SETS_BASE_URL_D2 = "https://api.dofusdu.de/dofus2/{}/sets/all" #  RIP
+SETS_BASE_URL_D3 = "https://api.dofusdu.de/dofus3/v1/{}/sets/all"
+
+ITEMS_BASE_URL_D2 = "https://api.dofusdu.de/dofus2/{}/items/equipment/all" #  RIP
+ITEMS_BASE_URL_D3 = "https://api.dofusdu.de/dofus3/v1/{}/items/equipment/all"
+
+BETA_SETS_BASE_URL_D2 = "https://api.dofusdu.de/dofus3beta/v1/{}/sets/all"
+BETA_SETS_BASE_URL_D3 = "https://api.dofusdu.de/dofus3beta/v1/{}/sets/all"
+
+BETA_ITEMS_BASE_URL_D2 = "https://api.dofusdu.de/dofus3beta/v1/{}/items/equipment/all"
+BETA_ITEMS_BASE_URL_D3 = "https://api.dofusdu.de/dofus3beta/v1/{}/items/equipment/all"
+
 DOFUSLAB_GH_BASE_URL = "https://raw.githubusercontent.com/dofuslab/dofuslab/master/server/app/database/data/{}.json"
-BETA_SETS_BASE_URL = "https://api.dofusdu.de/dofus2beta/{}/sets/all"
-BETA_ITEMS_BASE_URL = "https://api.dofusdu.de/dofus2beta/{}/items/equipment/all"

@@ -100,8 +100,8 @@ def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replac
             fr_set = find_localized_item(dset["ankama_id"], dofusdude_data["fr"]["sets"])
             es_set = find_localized_item(dset["ankama_id"], dofusdude_data["es"]["sets"])
             de_set = find_localized_item(dset["ankama_id"], dofusdude_data["de"]["sets"])
-            it_set = find_localized_item(dset["ankama_id"], dofusdude_data["it"]["sets"])
             pt_set = find_localized_item(dset["ankama_id"], dofusdude_data["pt"]["sets"])
+            # it_set = find_localized_item(dset["ankama_id"], dofusdude_data["it"]["sets"])
 
             rebuilt_set = {
                 "id": str(dset["ankama_id"]),
@@ -109,9 +109,9 @@ def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replac
                     "en": en_set["name"],
                     "fr": fr_set["name"],
                     "de": de_set["name"],
-                    "it": it_set["name"],
                     "es": es_set["name"],
                     "pt": pt_set["name"],
+                    # "it": it_set["name"],
                 },
                 "bonuses": generate_set_bonuses(en_set["effects"]),
             }
