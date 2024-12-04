@@ -110,7 +110,7 @@ def main() -> None:
     )
     parser.add_argument("datafile", type=str, help="the data to fetch")
     parser.add_argument("-b", "--beta", action="store_true", help="Enables beta data fetch", default=False)
-    parser.add_argument("-u", "--unity", action="store_true", help="Enables Dofus 3 endpoints", default=False)
+    parser.add_argument("-u", "--unity", action=argparse.BooleanOptionalAction, help="Get Unity data (or not), defaults true", default=True)
 
     args = parser.parse_args()
 
