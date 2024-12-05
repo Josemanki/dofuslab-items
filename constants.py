@@ -3,6 +3,7 @@ NORMAL_STAT_MAP = {
     "Vitality": "Vitality",
     "Wisdom": "Wisdom",
     "Heals": "Heals",
+    "Heal": "Heals", # apparently, this is the new name for Heals?
     "AP": "AP",
     "Intelligence": "Intelligence",
     "Fire Resistance": "Fire Resistance",
@@ -111,7 +112,7 @@ CUSTOM_STAT_MAP = [
     "Learn the spell",
     "Subscribers only",
     "Level Incarnation",
-    "Emote",
+    "Emote", # Disable until Survival has better info than "Emote 0" and such?
     "Teleport to save point",
     "is no longer linear",
     "Someone's following you!",
