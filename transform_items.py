@@ -97,27 +97,6 @@ def format_image_and_download(image_urls):
     return img_id
 
 
-def transform_conditions(conditions: dict) -> dict:
-    """
-    Survival changed how he formats conditions and now there's a "condition_tree"
-    that this doesn't handle. As such, this will probably go away in favor of
-    handling the tree.
-    """
-    retConditions = {"conditions": {}}
-    condition_list = {"and": []}
-    for condition in conditions:
-        condition_list["and"].append(
-            {
-                "stat": condition["element"]["name"].upper().replace(" ", "_"),
-                "operator": condition["operator"],
-                "value": condition["int_value"],
-            }
-        )
-    retConditions["conditions"] = condition_list
-    retConditions["customConditions"] = {}
-    return retConditions
-
-
 def transform_condition(condition: dict) -> dict:
     """
     Transforms a single condition to the DofusLab style from Doduda
@@ -348,7 +327,7 @@ def transform_items(
         makedirs("output")
 
     for item in dofusdude_data["en"]["items"]:
-        if item["name"] == "Bounihime":
+        if item["name"] == "Minor Obstructor":
             print("break!") # for breakpointing a specific item while troubleshooting
 
         if skip and item_exists(item["name"], dofuslab_data):
@@ -372,20 +351,20 @@ def transform_items(
             custom_stats = {}
 
             # Locales
-            en_item = find_localized_item(item["ankama_id"], dofusdude_data["en"]["items"])
-            fr_item = find_localized_item(item["ankama_id"], dofusdude_data["fr"]["items"])
-            es_item = find_localized_item(item["ankama_id"], dofusdude_data["es"]["items"])
-            de_item = find_localized_item(item["ankama_id"], dofusdude_data["de"]["items"])
-            pt_item = find_localized_item(item["ankama_id"], dofusdude_data["pt"]["items"])
+            item_en = find_localized_item(item["ankama_id"], dofusdude_data["en"]["items"])
+            item_fr = find_localized_item(item["ankama_id"], dofusdude_data["fr"]["items"])
+            item_es = find_localized_item(item["ankama_id"], dofusdude_data["es"]["items"])
+            item_de = find_localized_item(item["ankama_id"], dofusdude_data["de"]["items"])
+            item_pt = find_localized_item(item["ankama_id"], dofusdude_data["pt"]["items"])
             # it_item = find_localized_item(item["ankama_id"], dofusdude_data["it"]["items"])
 
             if "en" in item_effects["customStats"]:
                 custom_stats = {
                     "en": item_effects["customStats"]["en"],
-                    "fr": localize_custom_stats_from_item(en_item, fr_item),
-                    "de": localize_custom_stats_from_item(en_item, de_item),
-                    "es": localize_custom_stats_from_item(en_item, es_item),
-                    "pt": localize_custom_stats_from_item(en_item, pt_item),
+                    "fr": localize_custom_stats_from_item(item_en, item_fr),
+                    "de": localize_custom_stats_from_item(item_en, item_de),
+                    "es": localize_custom_stats_from_item(item_en, item_es),
+                    "pt": localize_custom_stats_from_item(item_en, item_pt),
                     # "it": localize_custom_stats_from_item(en_item, it_item),
                 }
 
@@ -394,11 +373,11 @@ def transform_items(
                 # and convert it to a str later.
                 "dofusID": item["ankama_id"],
                 "name": {
-                    "en": en_item["name"],
-                    "fr": fr_item["name"],
-                    "de": de_item["name"],
-                    "es": es_item["name"],
-                    "pt": pt_item["name"],
+                    "en": item_en["name"],
+                    "fr": item_fr["name"],
+                    "de": item_de["name"],
+                    "es": item_es["name"],
+                    "pt": item_pt["name"],
                     # "it": it_item["name"],
                 },
                 "itemType": item["type"]["name"],
@@ -415,12 +394,9 @@ def transform_items(
                     "weapon_effects": item_effects["weaponStats"],
                 },
                 "customStats": custom_stats,
-                # "conditions": transform_conditions(item["conditions"])
-                # if "conditions" in item
-                # else {"conditions": {}, "customConditions": {}},
                 "conditions": (
-                    transform_condition_tree(item["condition_tree"])
-                    if "condition_tree" in item
+                    transform_condition_tree(item["conditions"])
+                    if "conditions" in item
                     else {"conditions": {}, "customConditions": {}}
                 ),
                 "imageUrl": format_image(item["image_urls"]),
@@ -438,22 +414,20 @@ def transform_items(
             custom_stats = {}
 
             # Locales
-            en_item = find_localized_item(item["ankama_id"], dofusdude_data["en"]["items"])
-            fr_item = find_localized_item(item["ankama_id"], dofusdude_data["fr"]["items"])
-            es_item = find_localized_item(item["ankama_id"], dofusdude_data["es"]["items"])
-            de_item = find_localized_item(item["ankama_id"], dofusdude_data["de"]["items"])
-            pt_item = find_localized_item(item["ankama_id"], dofusdude_data["pt"]["items"])
-            # it_item = find_localized_item(
-            #     item["ankama_id"], dofusdude_data["it"]["items"]
-            # )
+            item_en = find_localized_item(item["ankama_id"], dofusdude_data["en"]["items"])
+            item_fr = find_localized_item(item["ankama_id"], dofusdude_data["fr"]["items"])
+            item_es = find_localized_item(item["ankama_id"], dofusdude_data["es"]["items"])
+            item_de = find_localized_item(item["ankama_id"], dofusdude_data["de"]["items"])
+            item_pt = find_localized_item(item["ankama_id"], dofusdude_data["pt"]["items"])
+            # it_item = find_localized_item(item["ankama_id"], dofusdude_data["it"]["items"])
 
             if "en" in item_effects["customStats"]:
                 custom_stats = {
                     "en": item_effects["customStats"]["en"],
-                    "fr": localize_custom_stats_from_item(en_item, fr_item),
-                    "de": localize_custom_stats_from_item(en_item, de_item),
-                    "es": localize_custom_stats_from_item(en_item, es_item),
-                    "pt": localize_custom_stats_from_item(en_item, pt_item),
+                    "fr": localize_custom_stats_from_item(item_en, item_fr),
+                    "de": localize_custom_stats_from_item(item_en, item_de),
+                    "es": localize_custom_stats_from_item(item_en, item_es),
+                    "pt": localize_custom_stats_from_item(item_en, item_pt),
                     # "it": localize_custom_stats_from_item(en_item, it_item),
                 }
 
@@ -462,11 +436,11 @@ def transform_items(
                 # and convert it to a str later.
                 "dofusID": item["ankama_id"],
                 "name": {
-                    "en": en_item["name"],
-                    "fr": fr_item["name"],
-                    "de": de_item["name"],
-                    "es": es_item["name"],
-                    "pt": pt_item["name"],
+                    "en": item_en["name"],
+                    "fr": item_fr["name"],
+                    "de": item_de["name"],
+                    "es": item_es["name"],
+                    "pt": item_pt["name"],
                     # "it": it_item["name"],
                 },
                 "itemType": item["type"]["name"],
@@ -474,12 +448,9 @@ def transform_items(
                 "level": item["level"],
                 "stats": item_effects["stats"],
                 "customStats": custom_stats,
-                # "conditions": transform_conditions(item["conditions"])
-                # if "conditions" in item
-                # else {"conditions": {}, "customConditions": {}},
                 "conditions": (
-                    transform_condition_tree(item["condition_tree"])
-                    if "condition_tree" in item
+                    transform_condition_tree(item["conditions"])
+                    if "conditions" in item
                     else {"conditions": {}, "customConditions": {}}
                 ),
                 "imageUrl": format_image(item["image_urls"]),
