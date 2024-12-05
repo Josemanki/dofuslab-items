@@ -84,8 +84,12 @@ WEAPON_STAT_MAP = {
     "Air healing": "Air healing",
     "Water healing": "Water healing",
     "Earth healing": "Earth healing",
-
-
+    "<sprite name=\"feu\"> Fire heals": "Fire healing", # this is a little funny, but until it gets fixed...
+    "AP": "AP",
+    "MP": "MP",
+    # we don't support these yet:
+    # "Pushes back cell": "Pushes back cell",
+    # "Steals MP": "Steals MP"
 }
 
 CUSTOM_STAT_MAP = [

@@ -7,6 +7,7 @@ import logging
 import coloredlogs
 import re
 import requests
+
 from constants import (
     CUSTOM_STAT_MAP,
     NORMAL_STAT_MAP,
@@ -171,12 +172,19 @@ def transform_stats(stats: dict) -> dict:
     custom_stats = {"en": [], "fr": [], "de": [], "es": [], "pt": []}
 
     for stat in stats:
-        ## API ID for -AP is 179 and -MP is 192 - these are weapon stats only
         ## AP and MP for items are correctly handled in the mappings below.
-        if stat["type"]["id"] == 179 or stat["type"]["id"] == 192:
+        # ref: https://github.com/dofusdude/doduda/blob/main/persistent/elements.dofus3.main.json
+        # ref: https://github.com/dofusdude/dofusdude-py/blob/main/docs/MetaApi.md#get_meta_elements
+
+        # note: we may want to filter this more, perhaps by getting a more complete constants.WEAPON_STAT_MAP
+        if stat["type"]["is_active"]:
+            if stat["type"]["name"] not in WEAPON_STAT_MAP:
+                logger.warning(f"Warning: unsupported weapon stat type found: {stat["type"]["name"]}, skipping...")
+                continue
+            stat_name = WEAPON_STAT_MAP[stat["type"]["name"]]
             weapon_stats.append(
                 {
-                    "stat": stat["type"]["name"],
+                    "stat": stat_name,
                     "minStat": (stat["int_minimum"] if stat["int_maximum"] != 0 else None),
                     "maxStat": (stat["int_maximum"] if stat["int_maximum"] != 0 else stat["int_minimum"]),
                 }
@@ -327,8 +335,8 @@ def transform_items(
         makedirs("output")
 
     for item in dofusdude_data["en"]["items"]:
-        if item["name"] == "Minor Obstructor":
-            print("break!") # for breakpointing a specific item while troubleshooting
+        if item["name"] == "Phonemenal Scythe":
+            print("break!")  # for breakpointing a specific item while troubleshooting
 
         if skip and item_exists(item["name"], dofuslab_data):
             logger.info(f"Skipping: {item['name']}")
@@ -520,8 +528,8 @@ def transform_items(
 
     logger.info("Writing files...")
     # write our files:
-    with open("output/items.json", "w", encoding="utf8") as outfile:
-        outfile.write(json.dumps(my_data["items"], indent=4, ensure_ascii=False))
+    with open("output/items.json", "w", encoding="utf8", newline="\r\n") as outfile:
+        outfile.write(json.dumps(my_data["items"], indent=2, ensure_ascii=False))
         outfile.close()
 
     # this doesn't currently populate
@@ -529,7 +537,7 @@ def transform_items(
     #     outfile.write(json.dumps(final_data["mounts"], indent=2, ensure_ascii=False))
     #     outfile.close()
 
-    with open("output/pets.json", "w", encoding="utf8") as outfile:
+    with open("output/pets.json", "w", encoding="utf8", newline="\r\n") as outfile:
         outfile.write(json.dumps(my_data["pets"], indent=4, ensure_ascii=False))
         outfile.close()
 
@@ -538,8 +546,8 @@ def transform_items(
     #     outfile.write(json.dumps(dofuslab_data["rhineetles"] + final_data["rhineetles"], indent=2, ensure_ascii=False))
     #     outfile.close()
 
-    with open("output/weapons.json", "w", encoding="utf8") as outfile:
-        outfile.write(json.dumps(my_data["weapons"], indent=4, ensure_ascii=False))
+    with open("output/weapons.json", "w", encoding="utf8", newline="\r\n") as outfile:
+        outfile.write(json.dumps(my_data["weapons"], indent=2, ensure_ascii=False))
         outfile.close()
 
 

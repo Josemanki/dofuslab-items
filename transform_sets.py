@@ -122,12 +122,9 @@ def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replac
             final_sets.append(rebuilt_set)
             logger.info(f"Transformed:  {dset['name']}.")
 
-    with open("output/sets.json", "w+", encoding="utf8") as outfile:
+    with open("output/sets.json", "w+", encoding="utf8", newline="\r\n") as outfile:
         outfile.write(json.dumps(final_sets, ensure_ascii=False, indent=4))
         outfile.close()
-
-
-# __main__ = transform_sets(skip=False, replace=True)
 
 
 def main():
