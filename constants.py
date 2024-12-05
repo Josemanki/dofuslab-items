@@ -3,6 +3,7 @@ NORMAL_STAT_MAP = {
     "Vitality": "Vitality",
     "Wisdom": "Wisdom",
     "Heals": "Heals",
+    "Heal": "Heals", # apparently, this is the new name for Heals?
     "AP": "AP",
     "Intelligence": "Intelligence",
     "Fire Resistance": "Fire Resistance",
@@ -66,6 +67,29 @@ WEAPON_STAT_MAP = {
     "(Air healing)": "Air healing",
     "(Water healing)": "Water healing",
     "(Earth healing)": "Earth healing",
+    # Survival's API seems to have changed the formatting here to remove parenthesis
+    # in Dofus 3, so we'll add these to get it working again:
+    "Water damage": "Water damage",
+    "Fire damage": "Fire damage",
+    "Air damage": "Air damage",
+    "Earth damage": "Earth damage",
+    "Neutral damage": "Neutral damage",
+    "Neutral steal": "Neutral steal",
+    "Air steal": "Air steal",
+    "Water steal": "Water steal",
+    "Fire steal": "Fire steal",
+    "Earth steal": "Earth steal",
+    "HP restored": "HP restored",
+    "Fire healing": "Fire healing",
+    "Air healing": "Air healing",
+    "Water healing": "Water healing",
+    "Earth healing": "Earth healing",
+    "<sprite name=\"feu\"> Fire heals": "Fire healing", # this is a little funny, but until it gets fixed...
+    "AP": "AP",
+    "MP": "MP",
+    # we don't support these yet:
+    # "Pushes back cell": "Pushes back cell",
+    # "Steals MP": "Steals MP"
 }
 
 CUSTOM_STAT_MAP = [
@@ -91,6 +115,7 @@ CUSTOM_STAT_MAP = [
     "XP",
     "What's in there?",
     # "emote",
+    # "Emote", # Disable until Survival has better info than "Emote 0" and such?
     "Be level or higher",
     "Positions the compass",
     "No future smithmagic",
@@ -111,7 +136,6 @@ CUSTOM_STAT_MAP = [
     "Learn the spell",
     "Subscribers only",
     "Level Incarnation",
-    "Emote",
     "Teleport to save point",
     "is no longer linear",
     "Someone's following you!",
@@ -174,6 +198,17 @@ CUSTOM_STAT_MAP = [
     "Get a divorce",
     "-special spell-",
     "The spell can be cast on a free cell",
+    # Dofus 3 class item type names:
+    # note: a bunch of the custom effects above this section is probably deprecated now
+    ": - AP",
+    ": - cooldown",
+    ": + cast(s) per turn",
+    ": + cast(s) per target",
+    ": + Maximum Range",
+    ": line of sight off",
+    ": modifiable Range",
+    ": straight-line casting off",
+    ": +% Critical",
 ]
 
 PET_ITEM_TYPES = ["Pet", "Petsmount"]
@@ -316,8 +351,16 @@ IGNORED_ITEM_IDS = [
 ]
 
 
-SETS_BASE_URL = "https://api.dofusdu.de/dofus2/{}/sets/all"
-ITEMS_BASE_URL = "https://api.dofusdu.de/dofus2/{}/items/equipment/all"
+SETS_BASE_URL_D2 = "https://api.dofusdu.de/dofus2/{}/sets/all" #  RIP
+SETS_BASE_URL_D3 = "https://api.dofusdu.de/dofus3/v1/{}/sets/all"
+
+ITEMS_BASE_URL_D2 = "https://api.dofusdu.de/dofus2/{}/items/equipment/all" #  RIP
+ITEMS_BASE_URL_D3 = "https://api.dofusdu.de/dofus3/v1/{}/items/equipment/all"
+
+BETA_SETS_BASE_URL_D2 = "https://api.dofusdu.de/dofus3beta/v1/{}/sets/all"
+BETA_SETS_BASE_URL_D3 = "https://api.dofusdu.de/dofus3beta/v1/{}/sets/all"
+
+BETA_ITEMS_BASE_URL_D2 = "https://api.dofusdu.de/dofus3beta/v1/{}/items/equipment/all"
+BETA_ITEMS_BASE_URL_D3 = "https://api.dofusdu.de/dofus3beta/v1/{}/items/equipment/all"
+
 DOFUSLAB_GH_BASE_URL = "https://raw.githubusercontent.com/dofuslab/dofuslab/master/server/app/database/data/{}.json"
-BETA_SETS_BASE_URL = "https://api.dofusdu.de/dofus2beta/{}/sets/all"
-BETA_ITEMS_BASE_URL = "https://api.dofusdu.de/dofus2beta/{}/items/equipment/all"

@@ -52,19 +52,23 @@ def find_localized_item(item_id, language_data):
 
 def generate_set_bonuses(bonuses):
     # Bonuses is a 2D array from Dofusdude, that needs to be transformed to an object, with number keys and arrays as values
-    transformed = {}
+    dofuslab_bonuses = {}
 
     logger.debug(f"Number of bonuses: {len(bonuses)}")
 
-    for i in range(1, len(bonuses) + 1):
-        transformed[i + 1] = []
+    for bonus_key, bonus_values in bonuses.items():
+        if not bonus_values:
+            continue
 
-        for bonus in bonuses[i - 1]:
-            if bonus["type"]["name"] in NORMAL_STAT_MAP:
-                transformed[i + 1].append(
-                    {"stat": NORMAL_STAT_MAP[bonus["type"]["name"]], "value": bonus["int_minimum"], "altStat": None}
+        set_bonus = []
+        for bonus_value in bonus_values:
+            if bonus_value["type"]["name"] in NORMAL_STAT_MAP:
+                set_bonus.append(
+                    {"stat": NORMAL_STAT_MAP[bonus_value["type"]["name"]], "value": bonus_value["int_minimum"], "altStat": None}
                 )
-    return transformed
+        dofuslab_bonuses[bonus_key] = set_bonus
+
+    return dofuslab_bonuses
 
 
 def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replace: bool = False):
@@ -100,7 +104,6 @@ def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replac
             fr_set = find_localized_item(dset["ankama_id"], dofusdude_data["fr"]["sets"])
             es_set = find_localized_item(dset["ankama_id"], dofusdude_data["es"]["sets"])
             de_set = find_localized_item(dset["ankama_id"], dofusdude_data["de"]["sets"])
-            it_set = find_localized_item(dset["ankama_id"], dofusdude_data["it"]["sets"])
             pt_set = find_localized_item(dset["ankama_id"], dofusdude_data["pt"]["sets"])
             it_set = find_localized_item(dset["ankama_id"], dofusdude_data["en"]["sets"])
 
@@ -110,7 +113,6 @@ def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replac
                     "en": en_set["name"],
                     "fr": fr_set["name"],
                     "de": de_set["name"],
-                    "it": it_set["name"],
                     "es": es_set["name"],
                     "pt": pt_set["name"],
                     "it": it_set["name"],
@@ -120,12 +122,9 @@ def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replac
             final_sets.append(rebuilt_set)
             logger.info(f"Transformed:  {dset['name']}.")
 
-    with open("output/sets.json", "w+", encoding="utf8") as outfile:
+    with open("output/sets.json", "w+", encoding="utf8", newline="\r\n") as outfile:
         outfile.write(json.dumps(final_sets, ensure_ascii=False, indent=4))
         outfile.close()
-
-
-# __main__ = transform_sets(skip=False, replace=True)
 
 
 def main():
