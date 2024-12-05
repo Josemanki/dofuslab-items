@@ -67,6 +67,25 @@ WEAPON_STAT_MAP = {
     "(Air healing)": "Air healing",
     "(Water healing)": "Water healing",
     "(Earth healing)": "Earth healing",
+    # Survival's API seems to have changed the formatting here to remove parenthesis
+    # in Dofus 3, so we'll add these to get it working again:
+    "Water damage": "Water damage",
+    "Fire damage": "Fire damage",
+    "Air damage": "Air damage",
+    "Earth damage": "Earth damage",
+    "Neutral damage": "Neutral damage",
+    "Neutral steal": "Neutral steal",
+    "Air steal": "Air steal",
+    "Water steal": "Water steal",
+    "Fire steal": "Fire steal",
+    "Earth steal": "Earth steal",
+    "HP restored": "HP restored",
+    "Fire healing": "Fire healing",
+    "Air healing": "Air healing",
+    "Water healing": "Water healing",
+    "Earth healing": "Earth healing",
+
+
 }
 
 CUSTOM_STAT_MAP = [
