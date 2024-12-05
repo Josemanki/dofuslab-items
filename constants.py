@@ -92,6 +92,7 @@ CUSTOM_STAT_MAP = [
     "XP",
     "What's in there?",
     # "emote",
+    # "Emote", # Disable until Survival has better info than "Emote 0" and such?
     "Be level or higher",
     "Positions the compass",
     "No future smithmagic",
@@ -112,7 +113,6 @@ CUSTOM_STAT_MAP = [
     "Learn the spell",
     "Subscribers only",
     "Level Incarnation",
-    "Emote", # Disable until Survival has better info than "Emote 0" and such?
     "Teleport to save point",
     "is no longer linear",
     "Someone's following you!",
@@ -175,6 +175,17 @@ CUSTOM_STAT_MAP = [
     "Get a divorce",
     "-special spell-",
     "The spell can be cast on a free cell",
+    # Dofus 3 class item type names:
+    # note: a bunch of the custom effects above this section is probably deprecated now
+    ": - AP",
+    ": - cooldown",
+    ": + cast(s) per turn",
+    ": + cast(s) per target",
+    ": + Maximum Range",
+    ": line of sight off",
+    ": modifiable Range",
+    ": straight-line casting off",
+    ": +% Critical",
 ]
 
 PET_ITEM_TYPES = ["Pet", "Petsmount"]

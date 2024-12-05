@@ -245,25 +245,27 @@ def localize_custom_stats_from_item(en_item, item):
     custom_stats = []
 
     for effect in zip(en_item["effects"], item["effects"]):
-        if effect[0]["type"]["name"] not in NORMAL_STAT_MAP:
-            # if it's not in the normal stat map, it's *probably* something
-            #  that we want to include, but there's a couple examples of stuff
-            #  that we don't want to include:
-            # - Exchangable: 0
-            # - Emote: 0
-            # note: they seem to be somewhat inconsistently typed, might be something
-            #  Survival has control over.
-            # so, let's filter these out:
-            if effect[0]["type"]["name"] in ["Exchangeable:", "emote", "Emote"]:
-                continue
+        if effect[0]["type"]["name"] in NORMAL_STAT_MAP:
+            continue
 
-            # apparently we also need to filter out damage lines on weapons:
-            if " damage)" in effect[0]["type"]["name"]:
-                continue
-            if " steal)" in effect[0]["type"]["name"]:
-                continue
+        # if it's not in the normal stat map, it's *probably* something
+        #  that we want to include, but there's a couple examples of stuff
+        #  that we don't want to include:
+        # - Exchangable: 0
+        # - Emote: 0
+        # note: they seem to be somewhat inconsistently typed, might be something
+        #  Survival has control over.
+        # so, let's filter these out:
+        if effect[0]["type"]["name"] in ["Exchangeable:", "emote", "Emote"]:
+            continue
 
-            custom_stats.append(effect[1]["formatted"])
+        # apparently we also need to filter out damage lines on weapons:
+        if " damage)" in effect[0]["type"]["name"]:
+            continue
+        if " steal)" in effect[0]["type"]["name"]:
+            continue
+
+        custom_stats.append(effect[1]["formatted"])
 
     return custom_stats
 
@@ -341,7 +343,7 @@ def transform_items(
         makedirs("output")
 
     for item in dofusdude_data["en"]["items"]:
-        if item["name"] == "Ebony Dofus":
+        if item["name"] == "Hat Ariutokinabot":
             print("break!")
 
         if skip and item_exists(item["name"], dofuslab_data):
@@ -357,127 +359,133 @@ def transform_items(
             continue
         elif item["is_weapon"]:
             # WEAPON TRANSFORMATION
-            if "effects" in item and item["type"]["name"] not in IGNORED_CATEGORIES:
-                logger.debug(f"Adding: {item['name']}")
-                item_effects = transform_stats(item["effects"])
-                custom_stats = {}
+            # if "effects" in item and item["type"]["name"] not in IGNORED_CATEGORIES:
+            if "effects" not in item or item["type"]["name"] in IGNORED_CATEGORIES:
+                continue
 
-                # Locales
-                en_item = find_localized_item(item["ankama_id"], dofusdude_data["en"]["items"])
-                fr_item = find_localized_item(item["ankama_id"], dofusdude_data["fr"]["items"])
-                es_item = find_localized_item(item["ankama_id"], dofusdude_data["es"]["items"])
-                de_item = find_localized_item(item["ankama_id"], dofusdude_data["de"]["items"])
-                pt_item = find_localized_item(item["ankama_id"], dofusdude_data["pt"]["items"])
-                # it_item = find_localized_item(
-                #     item["ankama_id"], dofusdude_data["it"]["items"]
-                # )
+            logger.debug(f"Adding: {item['name']}")
+            item_effects = transform_stats(item["effects"])
+            custom_stats = {}
 
-                if "en" in item_effects["customStats"]:
-                    custom_stats = {
-                        "en": item_effects["customStats"]["en"],
-                        "fr": localize_custom_stats_from_item(en_item, fr_item),
-                        "de": localize_custom_stats_from_item(en_item, de_item),
-                        "es": localize_custom_stats_from_item(en_item, es_item),
-                        "pt": localize_custom_stats_from_item(en_item, pt_item),
-                        # "it": localize_custom_stats_from_item(en_item, it_item),
-                    }
+            # Locales
+            en_item = find_localized_item(item["ankama_id"], dofusdude_data["en"]["items"])
+            fr_item = find_localized_item(item["ankama_id"], dofusdude_data["fr"]["items"])
+            es_item = find_localized_item(item["ankama_id"], dofusdude_data["es"]["items"])
+            de_item = find_localized_item(item["ankama_id"], dofusdude_data["de"]["items"])
+            pt_item = find_localized_item(item["ankama_id"], dofusdude_data["pt"]["items"])
+            # it_item = find_localized_item(
+            #     item["ankama_id"], dofusdude_data["it"]["items"]
+            # )
 
-                rebuilt_item = {
-                    # this needs to be a str, but for the purposes of sorting, we'll make it an int
-                    # and convert it to a str later.
-                    "dofusID": item["ankama_id"],
-                    "name": {
-                        "en": en_item["name"],
-                        "fr": fr_item["name"],
-                        "de": de_item["name"],
-                        "es": es_item["name"],
-                        "pt": pt_item["name"],
-                        # "it": it_item["name"],
-                    },
-                    "itemType": item["type"]["name"],
-                    "setID": (str(item["parent_set"]["id"]) if "parent_set" in item else None),
-                    "level": item["level"],
-                    "stats": item_effects["stats"],
-                    "weaponStats": {
-                        "apCost": item["ap_cost"],
-                        "usesPerTurn": item["max_cast_per_turn"],
-                        "minRange": (item["range"]["min"] if item["range"]["min"] != item["range"]["max"] else None),
-                        "maxRange": item["range"]["max"],
-                        "baseCritChance": item["critical_hit_probability"],
-                        "critBonusDamage": item["critical_hit_bonus"],
-                        "weapon_effects": item_effects["weaponStats"],
-                    },
-                    "customStats": custom_stats,
-                    # "conditions": transform_conditions(item["conditions"])
-                    # if "conditions" in item
-                    # else {"conditions": {}, "customConditions": {}},
-                    "conditions": (
-                        transform_condition_tree(item["condition_tree"])
-                        if "condition_tree" in item
-                        else {"conditions": {}, "customConditions": {}}
-                    ),
-                    "imageUrl": format_image(item["image_urls"]),
+            if "en" in item_effects["customStats"]:
+                custom_stats = {
+                    "en": item_effects["customStats"]["en"],
+                    "fr": localize_custom_stats_from_item(en_item, fr_item),
+                    "de": localize_custom_stats_from_item(en_item, de_item),
+                    "es": localize_custom_stats_from_item(en_item, es_item),
+                    "pt": localize_custom_stats_from_item(en_item, pt_item),
+                    # "it": localize_custom_stats_from_item(en_item, it_item),
                 }
-                categorize_item(rebuilt_item, my_data)
-                if download_imgs:
-                    format_image_and_download(item["image_urls"])
+
+            rebuilt_item = {
+                # this needs to be a str, but for the purposes of sorting, we'll make it an int
+                # and convert it to a str later.
+                "dofusID": item["ankama_id"],
+                "name": {
+                    "en": en_item["name"],
+                    "fr": fr_item["name"],
+                    "de": de_item["name"],
+                    "es": es_item["name"],
+                    "pt": pt_item["name"],
+                    # "it": it_item["name"],
+                },
+                "itemType": item["type"]["name"],
+                "setID": (str(item["parent_set"]["id"]) if "parent_set" in item else None),
+                "level": item["level"],
+                "stats": item_effects["stats"],
+                "weaponStats": {
+                    "apCost": item["ap_cost"],
+                    "usesPerTurn": item["max_cast_per_turn"],
+                    "minRange": (item["range"]["min"] if item["range"]["min"] != item["range"]["max"] else None),
+                    "maxRange": item["range"]["max"],
+                    "baseCritChance": item["critical_hit_probability"],
+                    "critBonusDamage": item["critical_hit_bonus"],
+                    "weapon_effects": item_effects["weaponStats"],
+                },
+                "customStats": custom_stats,
+                # "conditions": transform_conditions(item["conditions"])
+                # if "conditions" in item
+                # else {"conditions": {}, "customConditions": {}},
+                "conditions": (
+                    transform_condition_tree(item["condition_tree"])
+                    if "condition_tree" in item
+                    else {"conditions": {}, "customConditions": {}}
+                ),
+                "imageUrl": format_image(item["image_urls"]),
+            }
+            categorize_item(rebuilt_item, my_data)
+            if download_imgs:
+                format_image_and_download(item["image_urls"])
         else:
             # ITEM TRANSFORMATION
-            if "effects" in item and item["type"]["name"] not in IGNORED_CATEGORIES:
-                logger.debug(f"Adding: {item['name']}")
-                item_effects = transform_stats(item["effects"])
-                custom_stats = {}
+            # if "effects" in item and item["type"]["name"] not in IGNORED_CATEGORIES:
+            if "effects" not in item or item["type"]["name"] in IGNORED_CATEGORIES:
+                continue
 
-                # Locales
-                en_item = find_localized_item(item["ankama_id"], dofusdude_data["en"]["items"])
-                fr_item = find_localized_item(item["ankama_id"], dofusdude_data["fr"]["items"])
-                es_item = find_localized_item(item["ankama_id"], dofusdude_data["es"]["items"])
-                de_item = find_localized_item(item["ankama_id"], dofusdude_data["de"]["items"])
-                pt_item = find_localized_item(item["ankama_id"], dofusdude_data["pt"]["items"])
-                # it_item = find_localized_item(
-                #     item["ankama_id"], dofusdude_data["it"]["items"]
-                # )
+            logger.debug(f"Adding: {item['name']}")
+            item_effects = transform_stats(item["effects"])
+            custom_stats = {}
 
-                if "en" in item_effects["customStats"]:
-                    custom_stats = {
-                        "en": item_effects["customStats"]["en"],
-                        "fr": localize_custom_stats_from_item(en_item, fr_item),
-                        "de": localize_custom_stats_from_item(en_item, de_item),
-                        "es": localize_custom_stats_from_item(en_item, es_item),
-                        "pt": localize_custom_stats_from_item(en_item, pt_item),
-                        # "it": localize_custom_stats_from_item(en_item, it_item),
-                    }
+            # Locales
+            en_item = find_localized_item(item["ankama_id"], dofusdude_data["en"]["items"])
+            fr_item = find_localized_item(item["ankama_id"], dofusdude_data["fr"]["items"])
+            es_item = find_localized_item(item["ankama_id"], dofusdude_data["es"]["items"])
+            de_item = find_localized_item(item["ankama_id"], dofusdude_data["de"]["items"])
+            pt_item = find_localized_item(item["ankama_id"], dofusdude_data["pt"]["items"])
+            # it_item = find_localized_item(
+            #     item["ankama_id"], dofusdude_data["it"]["items"]
+            # )
 
-                rebuilt_item = {
-                    # this needs to be a str, but for the purposes of sorting, we'll make it an int
-                    # and convert it to a str later.
-                    "dofusID": item["ankama_id"],
-                    "name": {
-                        "en": en_item["name"],
-                        "fr": fr_item["name"],
-                        "de": de_item["name"],
-                        "es": es_item["name"],
-                        "pt": pt_item["name"],
-                        # "it": it_item["name"],
-                    },
-                    "itemType": item["type"]["name"],
-                    "setID": (str(item["parent_set"]["id"]) if "parent_set" in item else None),
-                    "level": item["level"],
-                    "stats": item_effects["stats"],
-                    "customStats": custom_stats,
-                    # "conditions": transform_conditions(item["conditions"])
-                    # if "conditions" in item
-                    # else {"conditions": {}, "customConditions": {}},
-                    "conditions": (
-                        transform_condition_tree(item["condition_tree"])
-                        if "condition_tree" in item
-                        else {"conditions": {}, "customConditions": {}}
-                    ),
-                    "imageUrl": format_image(item["image_urls"]),
+            if "en" in item_effects["customStats"]:
+                custom_stats = {
+                    "en": item_effects["customStats"]["en"],
+                    "fr": localize_custom_stats_from_item(en_item, fr_item),
+                    "de": localize_custom_stats_from_item(en_item, de_item),
+                    "es": localize_custom_stats_from_item(en_item, es_item),
+                    "pt": localize_custom_stats_from_item(en_item, pt_item),
+                    # "it": localize_custom_stats_from_item(en_item, it_item),
                 }
-                categorize_item(rebuilt_item, my_data)
-                if download_imgs:
-                    format_image_and_download(item["image_urls"])
+
+            rebuilt_item = {
+                # this needs to be a str, but for the purposes of sorting, we'll make it an int
+                # and convert it to a str later.
+                "dofusID": item["ankama_id"],
+                "name": {
+                    "en": en_item["name"],
+                    "fr": fr_item["name"],
+                    "de": de_item["name"],
+                    "es": es_item["name"],
+                    "pt": pt_item["name"],
+                    # "it": it_item["name"],
+                },
+                "itemType": item["type"]["name"],
+                "setID": (str(item["parent_set"]["id"]) if "parent_set" in item else None),
+                "level": item["level"],
+                "stats": item_effects["stats"],
+                "customStats": custom_stats,
+                # "conditions": transform_conditions(item["conditions"])
+                # if "conditions" in item
+                # else {"conditions": {}, "customConditions": {}},
+                "conditions": (
+                    transform_condition_tree(item["condition_tree"])
+                    if "condition_tree" in item
+                    else {"conditions": {}, "customConditions": {}}
+                ),
+                "imageUrl": format_image(item["image_urls"]),
+            }
+            categorize_item(rebuilt_item, my_data)
+            if download_imgs:
+                format_image_and_download(item["image_urls"])
 
     # more processing to remove extra conditions on pets:
     logger.info("Cleaning up conditions on pets...")
