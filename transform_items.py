@@ -265,7 +265,12 @@ def localize_custom_stats_from_item(en_item, item):
         if " steal)" in effect[0]["type"]["name"]:
             continue
 
-        custom_stats.append(effect[1]["formatted"])
+        # skip adding this if it's weapon damage lines:
+        if effect[0]["type"]["name"] in WEAPON_STAT_MAP:
+            continue
+
+        if effect[0]["type"]["name"] in CUSTOM_STAT_MAP:
+            custom_stats.append(effect[1]["formatted"])
 
     return custom_stats
 
@@ -343,8 +348,8 @@ def transform_items(
         makedirs("output")
 
     for item in dofusdude_data["en"]["items"]:
-        if item["name"] == "Hat Ariutokinabot":
-            print("break!")
+        if item["name"] == "Bounihime":
+            print("break!") # for breakpointing a specific item while troubleshooting
 
         if skip and item_exists(item["name"], dofuslab_data):
             logger.info(f"Skipping: {item['name']}")
@@ -359,7 +364,6 @@ def transform_items(
             continue
         elif item["is_weapon"]:
             # WEAPON TRANSFORMATION
-            # if "effects" in item and item["type"]["name"] not in IGNORED_CATEGORIES:
             if "effects" not in item or item["type"]["name"] in IGNORED_CATEGORIES:
                 continue
 
@@ -373,9 +377,7 @@ def transform_items(
             es_item = find_localized_item(item["ankama_id"], dofusdude_data["es"]["items"])
             de_item = find_localized_item(item["ankama_id"], dofusdude_data["de"]["items"])
             pt_item = find_localized_item(item["ankama_id"], dofusdude_data["pt"]["items"])
-            # it_item = find_localized_item(
-            #     item["ankama_id"], dofusdude_data["it"]["items"]
-            # )
+            # it_item = find_localized_item(item["ankama_id"], dofusdude_data["it"]["items"])
 
             if "en" in item_effects["customStats"]:
                 custom_stats = {
@@ -428,7 +430,6 @@ def transform_items(
                 format_image_and_download(item["image_urls"])
         else:
             # ITEM TRANSFORMATION
-            # if "effects" in item and item["type"]["name"] not in IGNORED_CATEGORIES:
             if "effects" not in item or item["type"]["name"] in IGNORED_CATEGORIES:
                 continue
 
