@@ -58,7 +58,7 @@ def main():
                "weapons": process_diff(weapons_diff),
                }
 
-        print(json.dumps(out, indent=4))
+        print(json.dumps(out, indent=4, ensure_ascii=False))
 
     except FileNotFoundError as e:
         print(f"Error: {e}")
