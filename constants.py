@@ -31,6 +31,7 @@ NORMAL_STAT_MAP = {
     "Strength": "Strength",
     "Critical Resistance": "Critical Resistance",
     "Air Damage": "Air Damage",
+    "Air damage": "Air Damage",
     "Earth Damage": "Earth Damage",
     "Neutral Damage": "Neutral Damage",
     "MP Reduction": "MP Reduction",

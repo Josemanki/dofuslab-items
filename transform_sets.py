@@ -11,7 +11,8 @@ from constants import NORMAL_STAT_MAP
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-coloredlogs.install(level="INFO", logger=logger, fmt="%(asctime)s %(levelname)s %(message)s")
+coloredlogs.install(level="INFO", logger=logger,
+                    fmt="%(asctime)s %(levelname)s %(message)s")
 
 # from fetch import get_set_files, get_dofuslab_files
 # try:
@@ -36,7 +37,8 @@ def remove_item(name, dofuslab_sets_json):
 
 def find_localized_set(set_id, language_data):
     try:
-        found = next(set for set in language_data if set["ankama_id"] == set_id)
+        found = next(
+            set for set in language_data if set["ankama_id"] == set_id)
         return found
     except StopIteration:
         logger.error(f"Localized set not found for ID {set_id}!")
@@ -44,7 +46,8 @@ def find_localized_set(set_id, language_data):
 
 def find_localized_item(item_id, language_data):
     try:
-        found = next(item for item in language_data if item["ankama_id"] == item_id)
+        found = next(
+            item for item in language_data if item["ankama_id"] == item_id)
         return found
     except StopIteration:
         logger.error(f"Localized item not found for ID {item_id}!")
@@ -64,14 +67,15 @@ def generate_set_bonuses(bonuses):
         for bonus_value in bonus_values:
             if bonus_value["type"]["name"] in NORMAL_STAT_MAP:
                 set_bonus.append(
-                    {"stat": NORMAL_STAT_MAP[bonus_value["type"]["name"]], "value": bonus_value["int_minimum"], "altStat": None}
+                    {"stat": NORMAL_STAT_MAP[bonus_value["type"]["name"]],
+                        "value": bonus_value["int_minimum"], "altStat": None}
                 )
         dofuslab_bonuses[bonus_key] = set_bonus
 
     return dofuslab_bonuses
 
 
-def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replace: bool = False):
+def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replace: bool = False, line_ending: str = "\n"):
     # List of sets
     final_sets = []
 
@@ -89,7 +93,8 @@ def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replac
 
         if replace and item_exists(dset["name"], dofuslab_sets_json):
             # replace set if it already exists
-            logger.debug(f"Set {dset['name']} already exists, removing from array to replace with doduda...")
+            logger.debug(f"Set {
+                         dset['name']} already exists, removing from array to replace with doduda...")
             remove_item(dset["name"], dofuslab_sets_json)
 
         if skip and item_exists(dset["name"], dofuslab_sets_json):
@@ -100,12 +105,18 @@ def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replac
             logger.debug(f"Adding {dset['name']}...")
 
             # Locales
-            en_set = find_localized_item(dset["ankama_id"], dofusdude_data["en"]["sets"])
-            fr_set = find_localized_item(dset["ankama_id"], dofusdude_data["fr"]["sets"])
-            es_set = find_localized_item(dset["ankama_id"], dofusdude_data["es"]["sets"])
-            de_set = find_localized_item(dset["ankama_id"], dofusdude_data["de"]["sets"])
-            pt_set = find_localized_item(dset["ankama_id"], dofusdude_data["pt"]["sets"])
-            it_set = find_localized_item(dset["ankama_id"], dofusdude_data["en"]["sets"])
+            en_set = find_localized_item(
+                dset["ankama_id"], dofusdude_data["en"]["sets"])
+            fr_set = find_localized_item(
+                dset["ankama_id"], dofusdude_data["fr"]["sets"])
+            es_set = find_localized_item(
+                dset["ankama_id"], dofusdude_data["es"]["sets"])
+            de_set = find_localized_item(
+                dset["ankama_id"], dofusdude_data["de"]["sets"])
+            pt_set = find_localized_item(
+                dset["ankama_id"], dofusdude_data["pt"]["sets"])
+            it_set = find_localized_item(
+                dset["ankama_id"], dofusdude_data["en"]["sets"])
 
             rebuilt_set = {
                 "id": str(dset["ankama_id"]),
@@ -122,7 +133,7 @@ def transform_sets(dofusdude_data, dofuslab_sets_json, skip: bool = True, replac
             final_sets.append(rebuilt_set)
             logger.info(f"Transformed:  {dset['name']}.")
 
-    with open("output/sets.json", "w+", encoding="utf8", newline="\r\n") as outfile:
+    with open("output/sets.json", "w+", encoding="utf8", newline=line_ending) as outfile:
         outfile.write(json.dumps(final_sets, ensure_ascii=False, indent=4))
         outfile.close()
 
@@ -155,6 +166,8 @@ def main():
         help="Ignores dofuslab data and regenerates entirely from doduda",
         default=False
     )
+    parser.add_argument('--crlf', action=argparse.BooleanOptionalAction,
+                        help="Output with CRLF line endings, else LF.", default=False)
 
     args = parser.parse_args()
 
@@ -162,7 +175,8 @@ def main():
 
     if args.verbose:
         logger.setLevel(logging.DEBUG)
-        coloredlogs.install(level="DEBUG", logger=logger, fmt="%(asctime)s %(levelname)s %(message)s")
+        coloredlogs.install(level="DEBUG", logger=logger,
+                            fmt="%(asctime)s %(levelname)s %(message)s")
 
     # Opening all languages in order to populate localized names
     # This will be a list of requests in the future, not so many files being opened
@@ -186,9 +200,9 @@ def main():
     de_dofusdude_data = json.load(dofusdude_json_de)
     dofusdude_json_de.close()
 
-    dofusdude_json_it = open("input/dofusdude/sets/it_all.json")
-    it_dofusdude_data = json.load(dofusdude_json_it)
-    dofusdude_json_it.close()
+    # dofusdude_json_it = open("input/dofusdude/sets/it_all.json")
+    # it_dofusdude_data = json.load(dofusdude_json_it)
+    # dofusdude_json_it.close()
 
     # Dofuslab sets
     dofuslab_sets_json = []
@@ -198,7 +212,8 @@ def main():
         dofuslab_json.close()
 
     # sort sets for convenience and consistency of output:
-    en_dofusdude_data["sets"] = sorted(en_dofusdude_data["sets"], key=lambda k: k["ankama_id"])
+    en_dofusdude_data["sets"] = sorted(
+        en_dofusdude_data["sets"], key=lambda k: k["ankama_id"])
     dofuslab_sets_json = sorted(dofuslab_sets_json, key=lambda d: d["id"])
 
     dofusdude_data = {}
@@ -209,7 +224,10 @@ def main():
     dofusdude_data["it"] = en_dofusdude_data
     dofusdude_data["pt"] = pt_dofusdude_data
 
-    transform_sets(dofusdude_data, dofuslab_sets_json, skip=args.skip, replace=args.replace)
+    line_ending = "\r\n" if args.crlf else "\n"
+
+    transform_sets(dofusdude_data, dofuslab_sets_json,
+                   skip=args.skip, replace=args.replace, line_ending=line_ending)
 
 
 if __name__ == "__main__":

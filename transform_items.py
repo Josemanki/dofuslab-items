@@ -324,6 +324,7 @@ def transform_items(
     download_imgs=False,
     import_titles=False,
     import_custom_conditions=False,
+    line_ending: str = "\n"
 ):
     # set up dictionary of lists of items
     my_data = {}
@@ -528,7 +529,7 @@ def transform_items(
 
     logger.info("Writing files...")
     # write our files:
-    with open("output/items.json", "w", encoding="utf8", newline="\r\n") as outfile:
+    with open("output/items.json", "w", encoding="utf8", newline=line_ending) as outfile:
         outfile.write(json.dumps(my_data["items"], indent=2, ensure_ascii=False))
         outfile.close()
 
@@ -537,7 +538,7 @@ def transform_items(
     #     outfile.write(json.dumps(final_data["mounts"], indent=2, ensure_ascii=False))
     #     outfile.close()
 
-    with open("output/pets.json", "w", encoding="utf8", newline="\r\n") as outfile:
+    with open("output/pets.json", "w", encoding="utf8", newline=line_ending) as outfile:
         outfile.write(json.dumps(my_data["pets"], indent=4, ensure_ascii=False))
         outfile.close()
 
@@ -546,7 +547,7 @@ def transform_items(
     #     outfile.write(json.dumps(dofuslab_data["rhineetles"] + final_data["rhineetles"], indent=2, ensure_ascii=False))
     #     outfile.close()
 
-    with open("output/weapons.json", "w", encoding="utf8", newline="\r\n") as outfile:
+    with open("output/weapons.json", "w", encoding="utf8", newline=line_ending) as outfile:
         outfile.write(json.dumps(my_data["weapons"], indent=2, ensure_ascii=False))
         outfile.close()
 
@@ -597,6 +598,8 @@ def main():
         help="Overwrites custom conditions with data from DofusLab",
         default=False,
     )
+    parser.add_argument('--crlf', action=argparse.BooleanOptionalAction,
+                        help="Output with CRLF line endings, else LF.", default=False)
 
     args = parser.parse_args()
 
@@ -629,7 +632,8 @@ def main():
     de_dofusdude_data = json.load(dofusdude_json_de)
     dofusdude_json_de.close()
 
-    dofusdude_json_it = open("input/dofusdude/equipment/it_all.json")
+    # dofusdude_json_it = open("input/dofusdude/equipment/it_all.json")
+    dofusdude_json_it = open("input/dofusdude/equipment/en_all.json")
     it_dofusdude_data = json.load(dofusdude_json_it)
     dofusdude_json_it.close()
 
@@ -691,6 +695,8 @@ def main():
         for item in dofuslab_data[category]:
             item["dofusID"] = int(item["dofusID"])
 
+    line_ending = "\r\n" if args.crlf else "\n"
+
     transform_items(
         dofusdude_data,
         dofuslab_data,
@@ -699,6 +705,7 @@ def main():
         download_imgs=args.download_imgs,
         import_titles=args.import_dofuslab_titles,
         import_custom_conditions=args.import_dofuslab_custom_conditions,
+        line_ending=line_ending
     )
 
 
