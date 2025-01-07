@@ -214,7 +214,8 @@ CUSTOM_STAT_MAP = [
 
 PET_ITEM_TYPES = ["Pet", "Petsmount"]
 
-DOFUSLAB_CATEGORIES = ["items", "mounts", "pets", "rhineetles", "sets", "weapons"]
+# DOFUSLAB_CATEGORIES = ["items", "mounts", "pets", "rhineetles", "sets", "weapons"]
+DOFUSLAB_CATEGORIES = ["items", "mounts", "pets", "sets", "weapons"]
 
 WEAPON_TYPES = [
     "Axe",
