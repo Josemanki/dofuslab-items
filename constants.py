@@ -350,6 +350,8 @@ IGNORED_ITEM_IDS = [
     17809,  # Ereziah Hammer (quest item)
     19637,  # Weapon Curse (quest item)
     25235,  # Danaba's Blade (quest item)
+    20210,  # Crocobur
+    20213,  # Crocobur
 ]
 
 
