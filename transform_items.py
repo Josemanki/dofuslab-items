@@ -681,11 +681,14 @@ def main():
     # convert ids to int:
     for category in dofuslab_data:
         for item in dofuslab_data[category]:
-            item["dofusID"] = int(item["dofusID"])
+            if "dofusID" in item:
+                item["dofusID"] = int(item["dofusID"])
+            if "mountDofusID" in item:
+                item["mountDofusID"] = int(item["mountDofusID"])
 
     # sort em for convenience:
     dofuslab_data["items"] = sorted(dofuslab_data["items"], key=lambda k: k["dofusID"])
-    dofuslab_data["mounts"] = sorted(dofuslab_data["mounts"], key=lambda k: k["dofusID"])
+    dofuslab_data["mounts"] = sorted(dofuslab_data["mounts"], key=lambda k: k["mountDofusID"])
     dofuslab_data["pets"] = sorted(dofuslab_data["pets"], key=lambda k: k["dofusID"])
     dofuslab_data["rhineetles"] = sorted(dofuslab_data["rhineetles"], key=lambda k: k["dofusID"])
     dofuslab_data["weapons"] = sorted(dofuslab_data["weapons"], key=lambda k: k["dofusID"])
@@ -693,7 +696,10 @@ def main():
     # convert ids back to str:
     for category in dofuslab_data:
         for item in dofuslab_data[category]:
-            item["dofusID"] = int(item["dofusID"])
+            if "dofusID" in item:
+                item["dofusID"] = str(item["dofusID"])
+            if "mountDofusID" in item:
+                item["mountDofusID"] = str(item["mountDofusID"])
 
     line_ending = "\r\n" if args.crlf else "\n"
 

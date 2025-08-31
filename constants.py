@@ -259,6 +259,10 @@ IGNORED_ITEM_TYPES = [
     "Badge",
 ]
 
+IGNORED_STATS = [
+    "BE_SUBSCRIBED"
+]
+
 IGNORED_ITEM_IDS = [
     # Osatopia 2 pets:
     29115,  # Naive Yakitoro
