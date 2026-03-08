@@ -12,6 +12,7 @@ from constants import (
     CUSTOM_STAT_MAP,
     NORMAL_STAT_MAP,
     PET_ITEM_TYPES,
+    MOUNT_TYPES,
     WEAPON_TYPES,
     WEAPON_STAT_MAP,
     IGNORED_CATEGORIES,
@@ -32,7 +33,7 @@ coloredlogs.install(level="INFO", logger=logger, fmt="%(asctime)s %(levelname)s 
 
 
 def item_exists(name, dofuslab_data):
-    # item_types = {"items", "mounts", "pets", "rhineetles", "weapons"}
+    # item_types = {"items", "mounts", "pets", "weapons"}
     for item_type in dofuslab_data:
         for i in dofuslab_data[item_type]:
             if i["name"]["en"] == name:
@@ -47,7 +48,7 @@ def remove_item(name, dofuslab_data):
                 break
 
 
-def categorize_item(item, data):
+def add_item_to_data(item, data):
     """
     Adds the item to the appropriate list in data
     """
@@ -58,10 +59,6 @@ def categorize_item(item, data):
     elif item["itemType"] in WEAPON_TYPES:
         data["weapons"].append(item)
         logger.info(f"Added:  {item['name']['en']} to weapons")
-
-    elif item["itemType"] == "Mount" and item["name"]["en"].contains("Rhineetle"):
-        data["rhineetles"].append(item)
-        logger.info(f"Added:  {item['name']['en']} to rhineetles")
 
     elif item["itemType"] == "Mount":
         data["mounts"].append(item)
@@ -328,7 +325,7 @@ def transform_items(
 ):
     # set up dictionary of lists of items
     my_data = {}
-    for item_type in {"items", "mounts", "pets", "rhineetles", "weapons"}:
+    for item_type in {"items", "mounts", "pets", "weapons"}:
         my_data[item_type] = []
 
     # make the output path in case it doesn't exist:
@@ -344,17 +341,12 @@ def transform_items(
             continue
         elif replace and item_exists(item["name"], dofuslab_data):
             remove_item(item["name"], dofuslab_data)
-        elif item["type"]["name"] in IGNORED_ITEM_TYPES:
+        elif item["type"]["name"] in IGNORED_ITEM_TYPES or item["ankama_id"] in IGNORED_ITEM_IDS or\
+              "effects" not in item or item["type"]["name"] in IGNORED_CATEGORIES:
             logger.info(f"Skipping: {item['name']}")
             continue
-        elif item["ankama_id"] in IGNORED_ITEM_IDS:
-            logger.info(f"Skipping: {item['name']}")
-            continue
-        elif item["is_weapon"]:
-            # WEAPON TRANSFORMATION
-            if "effects" not in item or item["type"]["name"] in IGNORED_CATEGORIES:
-                continue
-
+        elif item["type"]["name"] in MOUNT_TYPES:
+            # import mount:
             logger.debug(f"Adding: {item['name']}")
             item_effects = transform_stats(item["effects"])
             custom_stats = {}
@@ -365,7 +357,43 @@ def transform_items(
             item_es = find_localized_item(item["ankama_id"], dofusdude_data["es"]["items"])
             item_de = find_localized_item(item["ankama_id"], dofusdude_data["de"]["items"])
             item_pt = find_localized_item(item["ankama_id"], dofusdude_data["pt"]["items"])
-            it_item = find_localized_item(item["ankama_id"], dofusdude_data["fr"]["items"])
+            item_it = find_localized_item(item["ankama_id"], dofusdude_data["en"]["items"])
+
+            rebuilt_item = {
+                # this needs to be a str, but for the purposes of sorting, we'll make it an int
+                # and convert it to a str later.
+                "mountDofusID": item["ankama_id"],
+                "name": {
+                    "en": item_en["name"],
+                    "fr": item_fr["name"],
+                    "de": item_de["name"],
+                    "es": item_es["name"],
+                    "pt": item_pt["name"],
+                    "it": item_it["name"],
+                },
+                "itemType": "Mount",
+                "level": item["level"],
+                "stats": item_effects["stats"],
+                "customStats": custom_stats,
+                "imageUrl": format_image(item["image_urls"]),
+            }
+            add_item_to_data(rebuilt_item, my_data)
+            if download_imgs:
+                format_image_and_download(item["image_urls"])
+
+        elif item["is_weapon"]:
+            # WEAPON TRANSFORMATION
+            logger.debug(f"Adding: {item['name']}")
+            item_effects = transform_stats(item["effects"])
+            custom_stats = {}
+
+            # Locales
+            item_en = find_localized_item(item["ankama_id"], dofusdude_data["en"]["items"])
+            item_fr = find_localized_item(item["ankama_id"], dofusdude_data["fr"]["items"])
+            item_es = find_localized_item(item["ankama_id"], dofusdude_data["es"]["items"])
+            item_de = find_localized_item(item["ankama_id"], dofusdude_data["de"]["items"])
+            item_pt = find_localized_item(item["ankama_id"], dofusdude_data["pt"]["items"])
+            item_it = find_localized_item(item["ankama_id"], dofusdude_data["fr"]["items"])
 
             if "en" in item_effects["customStats"]:
                 custom_stats = {
@@ -410,14 +438,11 @@ def transform_items(
                 ),
                 "imageUrl": format_image(item["image_urls"]),
             }
-            categorize_item(rebuilt_item, my_data)
+            add_item_to_data(rebuilt_item, my_data)
             if download_imgs:
                 format_image_and_download(item["image_urls"])
         else:
             # ITEM TRANSFORMATION
-            if "effects" not in item or item["type"]["name"] in IGNORED_CATEGORIES:
-                continue
-
             logger.debug(f"Adding: {item['name']}")
             item_effects = transform_stats(item["effects"])
             custom_stats = {}
@@ -428,7 +453,7 @@ def transform_items(
             item_es = find_localized_item(item["ankama_id"], dofusdude_data["es"]["items"])
             item_de = find_localized_item(item["ankama_id"], dofusdude_data["de"]["items"])
             item_pt = find_localized_item(item["ankama_id"], dofusdude_data["pt"]["items"])
-            it_item = find_localized_item(item["ankama_id"], dofusdude_data["en"]["items"])
+            item_it = find_localized_item(item["ankama_id"], dofusdude_data["en"]["items"])
 
             if "en" in item_effects["customStats"]:
                 custom_stats = {
@@ -450,7 +475,7 @@ def transform_items(
                     "de": item_de["name"],
                     "es": item_es["name"],
                     "pt": item_pt["name"],
-                    "it": it_item["name"],
+                    "it": item_it["name"],
                 },
                 "itemType": item["type"]["name"],
                 "setID": (str(item["parent_set"]["id"]) if "parent_set" in item else None),
@@ -464,7 +489,7 @@ def transform_items(
                 ),
                 "imageUrl": format_image(item["image_urls"]),
             }
-            categorize_item(rebuilt_item, my_data)
+            add_item_to_data(rebuilt_item, my_data)
             if download_imgs:
                 format_image_and_download(item["image_urls"])
 
@@ -515,17 +540,23 @@ def transform_items(
         logger.info("Fixing custom conditions...")
         for data_block in my_data:
             for item in my_data[data_block]:
-                item["conditions"]["customConditions"] = get_dofuslab_customConditions_for_item(
-                    item["dofusID"], data_block, dofuslab_data
-                )
+                if "conditions" in item:
+                    # note: mounts don't have a DofusID, but they also don't have conditions, so...
+                    item["conditions"]["customConditions"] = get_dofuslab_customConditions_for_item(
+                        item["dofusID"], data_block, dofuslab_data
+                    )
 
     # sort items and change the dofusIDs to strings, since that's apparently load-bearing
     logger.info("Sorting items and converting IDs to strings...")
     for data_block in my_data:
-        my_data[data_block] = sorted(my_data[data_block], key=lambda d: d["dofusID"])
+        sort_key = "dofusID"
+        if data_block == "mounts":
+            sort_key = "mountDofusID"
+
+        my_data[data_block] = sorted(my_data[data_block], key=lambda d: d[sort_key])
 
         for item in my_data[data_block]:
-            item["dofusID"] = str(item["dofusID"])
+            item[sort_key] = str(item[sort_key])
 
     logger.info("Writing files...")
     # write our files:
@@ -534,18 +565,13 @@ def transform_items(
         outfile.close()
 
     # this doesn't currently populate
-    # with open("output/mounts.json", "w+", encoding="utf8") as outfile:
-    #     outfile.write(json.dumps(final_data["mounts"], indent=2, ensure_ascii=False))
-    #     outfile.close()
+    with open("output/mounts.json", "w+", encoding="utf8") as outfile:
+        outfile.write(json.dumps(my_data["mounts"], indent=4, ensure_ascii=False))
+        outfile.close()
 
     with open("output/pets.json", "w", encoding="utf8", newline=line_ending) as outfile:
         outfile.write(json.dumps(my_data["pets"], indent=4, ensure_ascii=False))
         outfile.close()
-
-    # this doesn't currently populate, so skip writing it
-    # with open("output/rhineetles.json", "w+", encoding="utf8") as outfile:
-    #     outfile.write(json.dumps(dofuslab_data["rhineetles"] + final_data["rhineetles"], indent=2, ensure_ascii=False))
-    #     outfile.close()
 
     with open("output/weapons.json", "w", encoding="utf8", newline=line_ending) as outfile:
         outfile.write(json.dumps(my_data["weapons"], indent=2, ensure_ascii=False))
@@ -669,10 +695,6 @@ def main():
     dofuslab_data["pets"] = json.load(dofuslab_current_pets)
     dofuslab_current_pets.close()
 
-    dofuslab_current_rhineetles = open("input/dofuslab/rhineetles.json", "r")
-    dofuslab_data["rhineetles"] = json.load(dofuslab_current_rhineetles)
-    dofuslab_current_rhineetles.close()
-
     dofuslab_current_weapons = open("input/dofuslab/weapons.json", "r")
     dofuslab_data["weapons"] = json.load(dofuslab_current_weapons)
     dofuslab_current_weapons.close()
@@ -686,11 +708,11 @@ def main():
             if "mountDofusID" in item:
                 item["mountDofusID"] = int(item["mountDofusID"])
 
-    # sort em for convenience:
+    # sort em for convenience (and clean diffs):
     dofuslab_data["items"] = sorted(dofuslab_data["items"], key=lambda k: k["dofusID"])
     dofuslab_data["mounts"] = sorted(dofuslab_data["mounts"], key=lambda k: k["mountDofusID"])
     dofuslab_data["pets"] = sorted(dofuslab_data["pets"], key=lambda k: k["dofusID"])
-    dofuslab_data["rhineetles"] = sorted(dofuslab_data["rhineetles"], key=lambda k: k["dofusID"])
+    # dofuslab_data["rhineetles"] = sorted(dofuslab_data["rhineetles"], key=lambda k: k["dofusID"])
     dofuslab_data["weapons"] = sorted(dofuslab_data["weapons"], key=lambda k: k["dofusID"])
 
     # convert ids back to str:

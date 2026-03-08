@@ -234,7 +234,9 @@ WEAPON_TYPES = [
 ]
 
 MOUNT_TYPES = [
-    "Dragoturkey Certificate",
+    "Dragoturkey",
+    "Rhineetle",
+    "Seemyool"
 ]
 
 IGNORED_CATEGORIES = [
@@ -255,6 +257,10 @@ IGNORED_ITEM_TYPES = [
     "Perceptor Shoes",
     "Perceptor Tunic",
     "Perceptor Banner",
+    # Mount Certs:
+    "Seemyool Certificate",
+    "Dragoturkey Certificate",
+    "Rhineetle Certificate",
     # Temporis items:
     "Badge",
 ]
