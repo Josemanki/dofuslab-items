@@ -3,7 +3,7 @@ NORMAL_STAT_MAP = {
     "Vitality": "Vitality",
     "Wisdom": "Wisdom",
     "Heals": "Heals",
-    "Heal": "Heals", # apparently, this is the new name for Heals?
+    "Heal": "Heals",  # apparently, this is the new name for Heals?
     "AP": "AP",
     "Intelligence": "Intelligence",
     "Fire Resistance": "Fire Resistance",
@@ -85,12 +85,15 @@ WEAPON_STAT_MAP = {
     "Air healing": "Air healing",
     "Water healing": "Water healing",
     "Earth healing": "Earth healing",
-    "<sprite name=\"feu\"> Fire heals": "Fire healing", # this is a little funny, but until it gets fixed...
+    '<sprite name="feu"> Fire heals': "Fire healing",  # this is a little funny, but until it gets fixed...
+    "Fire heals": "Fire healing",
     "AP": "AP",
     "MP": "MP",
     # we don't support these yet:
     # "Pushes back cell": "Pushes back cell",
-    # "Steals MP": "Steals MP"
+    # "Steals MP": "Steals MP",
+    "Attracts by cell": "Attract cells",
+    "best-element damage": "Best element damage",
 }
 
 CUSTOM_STAT_MAP = [
@@ -233,11 +236,7 @@ WEAPON_TYPES = [
     "Wand",
 ]
 
-MOUNT_TYPES = [
-    "Dragoturkey",
-    "Rhineetle",
-    "Seemyool"
-]
+MOUNT_TYPES = ["Dragoturkey", "Rhineetle", "Seemyool"]
 
 IGNORED_CATEGORIES = [
     "Sidekick",
@@ -265,9 +264,7 @@ IGNORED_ITEM_TYPES = [
     "Badge",
 ]
 
-IGNORED_STATS = [
-    "BE_SUBSCRIBED"
-]
+IGNORED_STATS = ["BE_SUBSCRIBED"]
 
 IGNORED_ITEM_IDS = [
     # Osatopia 2 pets:
@@ -365,10 +362,10 @@ IGNORED_ITEM_IDS = [
 ]
 
 
-SETS_BASE_URL_D2 = "https://api.dofusdu.de/dofus2/{}/sets/all" #  RIP
+SETS_BASE_URL_D2 = "https://api.dofusdu.de/dofus2/{}/sets/all"  #  RIP
 SETS_BASE_URL_D3 = "https://api.dofusdu.de/dofus3/v1/{}/sets/all"
 
-ITEMS_BASE_URL_D2 = "https://api.dofusdu.de/dofus2/{}/items/equipment/all" #  RIP
+ITEMS_BASE_URL_D2 = "https://api.dofusdu.de/dofus2/{}/items/equipment/all"  #  RIP
 ITEMS_BASE_URL_D3 = "https://api.dofusdu.de/dofus3/v1/{}/items/equipment/all"
 
 BETA_SETS_BASE_URL_D2 = "https://api.dofusdu.de/dofus3beta/v1/{}/sets/all"
