@@ -68,6 +68,7 @@ WEAPON_STAT_MAP = {
     "(Air healing)": "Air healing",
     "(Water healing)": "Water healing",
     "(Earth healing)": "Earth healing",
+    "(Neutral healing)": "Neutral healing",
     # Survival's API seems to have changed the formatting here to remove parenthesis
     # in Dofus 3, so we'll add these to get it working again:
     "Water damage": "Water damage",
@@ -85,6 +86,8 @@ WEAPON_STAT_MAP = {
     "Air healing": "Air healing",
     "Water healing": "Water healing",
     "Earth healing": "Earth healing",
+    "Neutral healing": "Neutral healing",
+    "Neutral heals": "Neutral healing",
     '<sprite name="feu"> Fire heals': "Fire healing",  # this is a little funny, but until it gets fixed...
     "Fire heals": "Fire healing",
     "AP": "AP",
