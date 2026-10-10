@@ -25,6 +25,13 @@ logger.setLevel(logging.INFO)
 
 coloredlogs.install(level="INFO", logger=logger, fmt="%(asctime)s %(levelname)s %(message)s")
 
+CUSTOM_STAT_TEMPLATE = re.compile(r"\{\{[^{}\n]+?::([^{}\n]+)\}\}")
+
+
+def sanitize_custom_stat(value: str) -> str:
+    """Replace a formatted link with its visible label, preserving surrounding text."""
+    return CUSTOM_STAT_TEMPLATE.sub(lambda match: match.group(1), value)
+
 # from fetch import get_item_files
 # try:
 #     get_item_files()
@@ -203,12 +210,12 @@ def transform_stats(stats: dict) -> dict:
                 }
             )
         elif stat["type"]["name"] in CUSTOM_STAT_MAP:
-            custom_stats["en"].append(stat["formatted"])
+            custom_stats["en"].append(sanitize_custom_stat(stat["formatted"]))
             custom_stats["fr"].append(stat["type"]["id"])
             custom_stats["de"].append(stat["type"]["id"])
             custom_stats["es"].append(stat["type"]["id"])
             custom_stats["pt"].append(stat["type"]["id"])
-            custom_stats["it"].append(stat["formatted"])
+            custom_stats["it"].append(sanitize_custom_stat(stat["formatted"]))
 
     return {
         "stats": normal_stats,
@@ -254,7 +261,7 @@ def localize_custom_stats_from_item(en_item, item):
             continue
 
         if effect[0]["type"]["name"] in CUSTOM_STAT_MAP:
-            custom_stats.append(effect[1]["formatted"])
+            custom_stats.append(sanitize_custom_stat(effect[1]["formatted"]))
 
     return custom_stats
 
@@ -533,7 +540,7 @@ def transform_items(
                     # add the title to our stats:
                     for lang in localizations:
                         if titles[lang] != "":
-                            item["customStats"][lang].append(titles[lang])
+                            item["customStats"][lang].append(sanitize_custom_stat(titles[lang]))
 
     # copy stuff over from dofuslab data for items that have custom (typically quest) conditions:
     if import_custom_conditions:
