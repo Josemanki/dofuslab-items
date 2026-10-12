@@ -45,7 +45,8 @@ NORMAL_STAT_MAP = {
     "Pushback Resistance": "Pushback Resistance",
     "% Ranged Damage": "% Ranged Damage",
     "AP Parry": "AP Parry",
-    "Pods": "pods",
+    "Pods": "pods",  # probably deprecated
+    "Pod": "pods",
     "Water Resistance": "Water Resistance",
     "Power (traps)": "Power (traps)",
     "% Spell Damage": "% Spell Damage",
