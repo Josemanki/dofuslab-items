@@ -98,6 +98,7 @@ WEAPON_STAT_MAP = {
     # "Steals MP": "Steals MP",
     "Attracts by cell": "Attract cells",
     "best-element damage": "Best element damage",
+    "best-element steal": "Best element steal",
 }
 
 CUSTOM_STAT_MAP = [
